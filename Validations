@@ -1,0 +1,58 @@
+#!/bin/bash
+
+
+validate_non_empty() {
+    if [ -z "$1" ]; then
+        echo "Warning: $1 cannot be empty."
+    fi
+}
+
+validate_already_exists() {
+    if [ -d "$1" ]; then
+        echo "Warning: $1 already exists."
+    fi
+}
+
+validate_valid_name() {
+    if [[ ! $1 =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+        echo "Warning: Invalid name '$1'. Name must start with a letter or underscore and contain only letters, numbers, and underscores."
+    fi
+}
+
+# Function: Validate column datatype
+validate_datatype() {
+    local validTypes=("int" "string" "float")
+    if [[ ! " ${validTypes[*]} " =~ " $1 " ]]; then
+        echo "Warning: Invalid datatype '$1'. Valid types are: ${validTypes[*]}"
+    fi
+}
+
+# Function: Validate unique column name
+validate_unique_column() {
+    if grep -q "^$1:" "$2"; then
+        echo "Warning: Column name '$1' already exists in $2."
+    fi
+}
+
+# Function: Validate primary key existence
+validate_primary_key() {
+    if ! grep -q "^$1:" "$2"; then
+        echo "Warning: Primary key column '$1' does not exist in $2."
+    fi
+}
+
+
+
+navigate_menu() {
+echo "Do you want to go back to the main menu? (yes/no)"
+read user_choice
+if [ "$user_choice" == "yes" ]; then
+    ./MainMenu
+elif [ "$user_choice" == "no" ]; then
+    echo "Exiting create_database. Goodbye!"
+    exit 0
+else
+    echo "Invalid option! Exiting create_database."
+    exit 1
+fi
+}

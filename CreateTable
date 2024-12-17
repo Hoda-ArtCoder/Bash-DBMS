@@ -1,0 +1,56 @@
+#!/bin/bash
+source ./Validations
+
+
+# Input table name
+echo "Enter the name of the table: "
+read tblName
+validate_non_empty "$tblName" "Table name"
+
+# Check if table exists
+if [ -f "$tblName" ]; #[if there is already a file created named $tblName]
+then
+    echo "Warrning: Table '$tblName' already exists."
+    exit 1
+else
+    touch "$tblName" "$tblName.metadata" #create datafile and metadata file
+    echo "...Table and metadata file created..."
+fi
+
+# Input number of columns
+echo "Enter the number of columns: "
+read colNum
+validate_non_empty "$colNum" "Number of columns"
+
+if [ "$colNum" -le 0 ]; then
+    echo "Warrning: Invalid number of columns."
+    exit 1
+fi
+
+# Loop to input columns
+for i in $(seq 1 "$colNum"); #loop through the number of columns
+do
+    echo "Enter the name of column $i followed by its datatype (int/string/float): "
+    read colName colType
+    validate_non_empty "$colName" "Column name"
+    validate_non_empty "$colType" "Datatype"
+    validate_datatype "$colType"
+    validate_unique_column "$colName" "$tblName.metadata"
+    echo "$colName:$colType" >> "$tblName.metadata"
+done
+
+# Set primary key
+echo "Enter the name of the primary key: "
+read primaryKey
+validate_non_empty "$primaryKey" "Primary key"
+validate_primary_key "$primaryKey" "$tblName.metadata"
+
+# Add primary key to metadata
+echo "# Primary key: $primaryKey" >> "$tblName.metadata"
+echo "Primary key set to $primaryKey."
+
+# Log the creation
+logFile="table_creation.log"
+echo "$(date): Created table '$tblName' with $colNum columns. Primary key: $primaryKey" >> "$logFile"
+
+echo "Table created successfully."

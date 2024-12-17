@@ -1,0 +1,22 @@
+#!/bin/bash
+source ./Validations
+
+function create_database() {
+  
+    echo "-------Enter the name of the database you want to create:--------"
+    read dbName
+    #checking validations
+    if validate_non_empty "$dbName" && validate_already_exists "$dbName" && validate_valid_name "$dbName"; then
+        echo "Processing...."
+        echo "Database name '$dbName' is valid."
+    fi
+
+    if mkdir "$dbName"; then
+        echo "---------Database '$dbName' created successfully----------"
+    else
+        echo "Could not create database '$dbName'."
+    fi
+    
+    navigate_menu
+
+}

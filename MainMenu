@@ -1,0 +1,32 @@
+#!/bin/bash
+source ./CreateDatabase
+source ./ConnectDatabase
+source ./DropDatabase
+source ./ListDatabase 
+
+echo "----------Welcome to the Database Management System---------"
+echo "Choose an option:-------------------------------------------"
+select option in "Create Database" "List Database" "Connect Database" "Drop Database" Exit; do
+    case $option in 
+        "Create Database")
+            create_database    # Call the function from CreateDatabase
+            ;;
+        "List Database")
+            list_database  # Call the function from ListDatabase
+            ;;
+        "Connect Database")
+            connect_database  # Call the function from ConnectDatabase
+            ;;
+        "Drop Database")
+            drop_database  # Call the function from DropDatabase
+            ;;
+        "Exit")
+            echo "Exiting... Goodbye!"
+            exit 0  # Exit the script
+            ;;
+        *)
+            echo "Invalid option. Please try again."
+            ;;
+    esac
+done
+
