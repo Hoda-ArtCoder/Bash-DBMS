@@ -1,6 +1,6 @@
 #!/bin/bash
 source ./Validations
-
+source ./Common
 function create_database() {
   
     echo "-------Enter the name of the database you want to create:--------"

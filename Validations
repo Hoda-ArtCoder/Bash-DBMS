@@ -1,6 +1,4 @@
 #!/bin/bash
-
-
 validate_non_empty() {
     if [ -z "$1" ]; then
         echo "Warning: $1 cannot be empty."
@@ -43,16 +41,4 @@ validate_primary_key() {
 
 
 
-navigate_menu() {
-echo "Do you want to go back to the main menu? (yes/no)"
-read user_choice
-if [ "$user_choice" == "yes" ]; then
-    ./MainMenu
-elif [ "$user_choice" == "no" ]; then
-    echo "Exiting create_database. Goodbye!"
-    exit 0
-else
-    echo "Invalid option! Exiting create_database."
-    exit 1
-fi
-}
+
