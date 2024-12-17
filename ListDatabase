@@ -2,20 +2,10 @@
 source ./Validations
 source ./Common
 
-# List all databases in the database directory using ls
 function list_database() {
-    echo "The following databases exist: "
-    ls -F | grep / | tr "/" " " #list all directories 
-    cd ../
+    echo "The following databases exist:-------------------------------------------------- "
+    #Lists directories in $DB_DIR and removes the trailing slashes from the directory names.
+    ls -F "$DB_DIR" | grep / | tr -d "/"
 
-# Example: List all databases in the directory
-echo "Listing all databases (directories) in '$DB_DIR':"
-for db in "$DB_DIR"/*/; do
-    if [ -d "$db" ]; then
-        db_name=$(basename "$db")  # Get the name of the directory (database)
-        echo "$db_name"
-    fi
-done
     navigate_menu
-
 }

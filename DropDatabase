@@ -1,4 +1,30 @@
 #!/bin/bash
-source ./Validations
+source ./Validations    
+source ./Common
 
-# Function: Connect to a database
+# Function to list and drop a database
+drop_database() {
+    # List all databases (directories) with a number
+    echo "-----------------Existing Databases:------------------"
+    select db in $(ls -d "$DB_DIR"/*/); do
+        if [ -n "$db" ]; then # Check if a database was selected
+            # List the selected database name
+            db_name=$(basename "$db")
+            echo "You selected database: $db_name"
+            
+            # Confirm before deleting
+            read -p "Are you sure you want to drop the database '$db_name'? (yes/no): " confirm
+            if [ "$confirm" == "yes" ]; then
+                # Delete the database directory
+                rm -rf "$db"
+                echo "Database '$db_name' has been dropped."
+                break
+            else
+                echo "Database drop operation canceled."
+                break
+            fi
+        else
+            echo "Invalid choice. Please select a valid database number."
+        fi
+    done
+}

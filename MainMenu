@@ -9,7 +9,7 @@ echo "Choose an option:-------------------------------------------"
 select option in "Create Database" "List Database" "Connect Database" "Drop Database" Exit; do
     case $option in 
         "Create Database")
-            create_database    # Call the function from CreateDatabase
+            create_database # Call the function from CreateDatabase
             ;;
         "List Database")
             list_database  # Call the function from ListDatabase
