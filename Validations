@@ -36,9 +36,9 @@ is_invalid_name() {
 
 # Function: Validate column datatype
 is_invalid_datatype() {
-    local validTypes=("int" "string" "float")
-    if [[ ! " ${validTypes[*]} " =~ " $1 " ]]; then
-        echo "Warning: Invalid datatype '$1'. Valid types are: ${validTypes[*]}"
+    declare -a arr=("int" "string")
+    if [[ ! " ${arr[*]} " =~ " $1 " ]]; then
+        echo "Warning: Invalid datatype '$1'. Valid types are: ${arr[*]}"
         return 0
     else
         return 1
