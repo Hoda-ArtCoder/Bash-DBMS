@@ -1,14 +1,14 @@
 #!/bin/bash
 
 #global path to database directory
-DB_DIR="../Bash Project/Databases/"
+DB_DIR="/home/hoda/Documents/Bash/Bash Project/Database/"
 
 
 navigate_menu() {
-    echo "Do you want to go back to the main menu? (yes/no)"
+    echo ">>Do you want to go back to the main menu? (yes/no)"
     read user_choice
     if [ "$user_choice" == "yes" ]; then
-        ./MainMenu
+         navigate_menu
     elif [ "$user_choice" == "no" ]; then
         echo "Exiting. Goodbye!"
         exit 0

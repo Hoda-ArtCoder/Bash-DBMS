@@ -5,16 +5,29 @@ source ./Validations
 flag = 1
 
 function set_primary_key() {
-    echo "Available columns:"
+
+
+    echo "You have defined the following columns:"
     awk -F: '{print $1}' "$metadata_file"
+    # Step 2: Display the columns
+    for ((i=0; i<num_columns; i++))
+    do
+        echo "$((i+1)). ${columns[$i]} (${column_types[$i]})"
+    done
+    echo "Enter the primary key column name: "
+    read primary_key_choice
 
-    echo "**Enter the name of the column to set as the primary key:"
-    read primary_key
 
-
-    if ! awk -F: -v pk="$primary_key" '$1 == pk {found=1} END {exit !found}' "$metadata_file"; then
-        echo "Warning: Column '$primary_key' not found in metadata."
-        exit 1
+    # Step 3: Ask the user to select a column number for the primary key
+    echo "Please enter the number of the column to be the primary key: "
+    read pk_number
+    
+    # Step 4: Validate the primary key selection
+    if [[ "$pk_number" -ge 1 && "$pk_number" -le "$num_columns" ]]; then
+        echo "You have selected ${columns[$((pk_number-1))]} as the primary key."
+    else
+        echo "Invalid selection. Please select a number between 1 and $num_columns."
+        flag = 0
     fi
 
     # Update the metadata file to mark the primary key
@@ -79,7 +92,7 @@ function create_table() {
     fi
 
     if flag == 1; then;
-        set_primary_key "$tblName"
+        set_primary_key "$$tblName.metadata"
     fi
 }
 

@@ -1,11 +1,15 @@
 #!/bin/bash
 source ./Validations
 source ./Common
-
+source ./ConnectDatabase
 function list_database() {
-    echo "The following databases exist:-------------------------------------------------- "
-    #Lists directories in $DB_DIR and removes the trailing slashes from the directory names.
-    ls -F "$DB_DIR" | grep / | tr -d "/"
-
-    navigate_menu
+    if [ -d "$DB_DIR" ]
+    then
+        echo "-- -- -- Databases Lists available -- -- --"
+        ls "$DB_DIR"
+        navigate_menu
+    else
+        echo ">>>>> No Databases Found! <<<<<<"
+        navigate_menu
+    fi
 }
