@@ -16,10 +16,11 @@ function create_database() {
         flag=1
     else
         flag=0
+        create_database
     fi
 
     if [ "$flag" -eq 1 ]; then
-        if mkdir "$dbName"; then
+        if mkdir "$DB_DIR/$dbName"; then
             echo "---------Database '$dbName' created successfully----------"
         else
             echo "Could not create database '$dbName'."

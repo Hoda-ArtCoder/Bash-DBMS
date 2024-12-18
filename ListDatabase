@@ -1,7 +1,6 @@
 #!/bin/bash
 source ./Validations
 source ./Common
-source ./ConnectDatabase
 function list_database() {
     if [ -d "$DB_DIR" ]
     then

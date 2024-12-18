@@ -56,7 +56,7 @@ is_duplicate_column() {
 }
 
 is_less_than_zero () {
-    if [ "$1" -le 0 ]; then
+    if [[ "$1" -le 0 ]]; then
         echo "Warning: Value must be bigger than zero."
         return 0
     else

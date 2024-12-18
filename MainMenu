@@ -5,9 +5,9 @@ source ./DropDatabase
 source ./ListDatabase 
 
 
-function navigate_menu() {
+function main_menu() {
     echo "----------Welcome to the Database Management System---------"
-    echo ">>Choose an option:-------------------------------------------"
+    echo ">> Choose an option:----------------------------------------"
     select option in "Create Database" "List Database" "Connect Database" "Drop Database" Exit; do
     case $option in 
         "Create Database")
@@ -34,4 +34,4 @@ done
 }
 
 
-navigate_menu
+main_menu
