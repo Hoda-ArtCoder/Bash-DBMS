@@ -5,15 +5,15 @@ DB_DIR="../Bash Project/Databases/"
 
 
 navigate_menu() {
-echo "Do you want to go back to the main menu? (yes/no)"
-read user_choice
-if [ "$user_choice" == "yes" ]; then
-    ./MainMenu
-elif [ "$user_choice" == "no" ]; then
-    echo "Exiting. Goodbye!"
-    exit 1
-else
-    echo "Invalid option! Exiting."
-    exit 0
-fi
+    echo "Do you want to go back to the main menu? (yes/no)"
+    read user_choice
+    if [ "$user_choice" == "yes" ]; then
+        ./MainMenu
+    elif [ "$user_choice" == "no" ]; then
+        echo "Exiting. Goodbye!"
+        exit 0
+    else
+        echo "Invalid option! Please try again."
+        navigate_menu
+    fi
 }
