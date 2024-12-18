@@ -1,56 +1,75 @@
 #!/bin/bash
 source ./Validations
 
+#declare flag variable to check sucess of operations
+flag = 1
 
-# Input table name
-echo "Enter the name of the table: "
-read tblName
-validate_non_empty "$tblName" "Table name"
+function set_primary_key() {
+    echo "Available columns:"
+    awk -F: '{print $1}' "$metadata_file"
 
-# Check if table exists
-if [ -f "$tblName" ]; #[if there is already a file created named $tblName]
-then
-    echo "Warrning: Table '$tblName' already exists."
-    exit 1
-else
-    touch "$tblName" "$tblName.metadata" #create datafile and metadata file
-    echo "...Table and metadata file created..."
-fi
+    echo "**Enter the name of the column to set as the primary key:"
+    read primary_key
 
-# Input number of columns
-echo "Enter the number of columns: "
-read colNum
-validate_non_empty "$colNum" "Number of columns"
+    # Check if the column exists in the metadata file
+    if ! awk -F: -v pk="$primary_key" '$1 == pk {found=1} END {exit !found}' "$metadata_file"; then
+        echo "Warning: Column '$primary_key' not found in metadata."
+        exit 1
+    fi
 
-if [ "$colNum" -le 0 ]; then
-    echo "Warrning: Invalid number of columns."
-    exit 1
-fi
+    # Update the metadata file to mark the primary key
+    awk -F: -v pk="$primary_key" '{
+        if ($1 == pk && $0 !~ /:PK$/) {
+            $0 = $0 ":PK"
+        }
+        print
+    }' "$metadata_file" > "${metadata_file}.tmp" && mv "${metadata_file}.tmp" "$metadata_file"
 
-# Loop to input columns
-for i in $(seq 1 "$colNum"); #loop through the number of columns
-do
-    echo "Enter the name of column $i followed by its datatype (int/string/float): "
-    read colName colType
-    validate_non_empty "$colName" "Column name"
-    validate_non_empty "$colType" "Datatype"
-    validate_datatype "$colType"
-    validate_unique_column "$colName" "$tblName.metadata"
-    echo "$colName:$colType" >> "$tblName.metadata"
-done
+    echo "Primary key '$primary_key' has been set successfully in '$metadata_file'."
+}
+function create_table() {
+    echo "**Enter the name of the table: "
+    read tblName
+    if ! is_empty_input "$tblName" && ! is_already_exists_file "$tblName" && ! is_invalid_name "$tblName" ; then
+        echo "Table name '$tblName' is valid.------------------"
+        echo "Continuing---------------------------------------"
+        # Input number of columns-------------------------------
+        echo "**Enter the number of columns in your table: "
+        read colNum
+        if ! is_empty_input '$colNum' && ! is_less_than_zero '$colNum'; then
 
-# Set primary key
-echo "Enter the name of the primary key: "
-read primaryKey
-validate_non_empty "$primaryKey" "Primary key"
-validate_primary_key "$primaryKey" "$tblName.metadata"
+            echo "files '$tblName' , '$tblName'.metadata created for the table creation..."
+            touch "$tblName" "$tblName.metadata" #create datafile and metadata file
 
-# Add primary key to metadata
-echo "# Primary key: $primaryKey" >> "$tblName.metadata"
-echo "Primary key set to $primaryKey."
+            echo "Number of columns '$colNum' is valid."
+            echo "Continuing-----------------------------------"
+            for i in $(seq 1 "$colNum"); #loop through the number of columns
+            do
+                echo "**Enter the name of column $i followed by its datatype (int/string/float):  eg: name string"
+                read colName colType
+                if ! is_empty_input "$colName" && ! is_invalid_name "$colName" &&  \
+                ! is_empty_input "$colType" && ! is_invalid_datatype "$colType" && \
+                ! is_duplicate_column "$colName" "$tblName.metadata" ; then
+                    echo "Passed validation checks for column '$colName'......."
+                    echo "Creating column '$colName' with datatype '$colType' in table '$tblName'..."
+                    echo "$colName:$colType" >> "$tblName.metadata"
+                else
+                    echo "Failed validation checks......."
+                    flag = 0
+                    exit 1
+                fi
+            done
+        else
+            echo "Failed validation checks......."
+            flag = 0
+        fi
+    fi 
+    #----------------------------------------------------------------------------------
+    if flag == 1; then;
+        set_primary_key "$tblName"
+    fi
+}
 
-# Log the creation
-logFile="table_creation.log"
-echo "$(date): Created table '$tblName' with $colNum columns. Primary key: $primaryKey" >> "$logFile"
-
-echo "Table created successfully."
+#temp code for testing .. delete later
+cd NewDB
+create_table
