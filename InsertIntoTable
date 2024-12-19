@@ -1,0 +1,3 @@
+#! /bin/bash
+
+function insert_into_table(){}

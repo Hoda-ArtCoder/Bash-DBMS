@@ -1,0 +1,3 @@
+#! /bin/bash
+
+function select_from_table(){}

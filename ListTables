@@ -1,0 +1,5 @@
+#! /bin/bash
+
+function listTables(){
+    echo "list tables"
+}

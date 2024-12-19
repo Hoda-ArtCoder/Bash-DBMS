@@ -1,0 +1,43 @@
+#! /bin/bash
+source ./CreateTable
+source ./ListTables
+source ./DropTable
+
+function tablesMenu(){
+    echo -e "${magenta}--------------------Welcome to $connDB-------------------------${clear}"
+    PS3=$(echo -e "${cyan}>> Choose an option: ${clear}") # Colorize the prompt
+
+    select option in "Create Table" "Insert into Table" "List Tables" "Select from Table" "Update Table" "Drop Table" "Delete from Table" "Exit"; do
+        case $option in
+            "Create Table")
+                create_table
+                ;;
+            "Insert into Table")
+                insert_into_table
+                ;;
+            "List Tables")
+                listTables
+                ;;
+            "Select from Table")
+                select_from_table
+                ;;
+            "Update Table") 
+                updateTable
+                ;;
+            "Drop Table")
+                dropTable
+                break
+                ;;
+            "Delete from Table")
+                deleteFromTable
+                ;;
+            "Exit")
+                echo -e "${blue}Exiting. Goodbye!${clear}"
+                exit 0
+                ;;
+            *)
+                echo -e "${yellow}Warning: Invalid option. Please try again.${clear}" 
+                ;;
+        esac
+    done
+}

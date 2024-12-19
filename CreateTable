@@ -94,8 +94,3 @@ function create_columns() {
         navigate_menu
     fi
 }
-    
-
-# Temp code for testing .. delete later
-cd Database/DB1
-create_table

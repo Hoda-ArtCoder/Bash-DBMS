@@ -1,16 +1,23 @@
 #!/bin/bash
 source ./Common
+source ./TablesMenu
 
 function connectDB(){
-read -p "Enter database name you want to connect: " connDB
+  echo -e "${cyan}>> Enter database name you want to connect: ${clear}" 
+  ls "$DB_DIR" 
+  read connDB
+
  if [ -e "$DB_DIR/$connDB" ];
  then
    cd "$DB_DIR/$connDB"
    echo "$connDB is selected"
-
-  echo "Current directory: $(pwd)" 
+   echo "Current directory: $(pwd)" 
+   Ps1="$DB_DIR/$connDB"
+   SelectDB="$connDB"
+   #tables menu 
+   tablesMenu
  else
    echo "DB is not selected"
  fi
- navigate_menu
+ #navigate_menu
 }
