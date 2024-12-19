@@ -1,7 +1,13 @@
 #!/bin/bash
-source ./Validations
-source ./Common
+connectDB(){
+read -p "Enter database name you want to connect: " connDB
+ if [ -e "$connDB" ];
+ then
+   cd ./$connDB
+   echo "$connDB is selected"
 
-function connect_database() {
-    echo ""
+  echo "Current directory: $(pwd)" 
+ else
+   echo "DB is not selected"
+ fi
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 source ./CreateDatabase
-source ./ConnectDatabase
+source ./ConnectDatabase 
 source ./DropDatabase
 source ./ListDatabase 
 source ./Validations
@@ -18,10 +18,12 @@ function main_menu() {
                 list_database  # Call the function from ListDatabase
                 ;;
             "Connect Database")
-                connect_database  # Call the function from ConnectDatabase
+                connectDB  
+                break  
                 ;;
             "Drop Database")
-                drop_database  # Call the function from DropDatabase
+                dropDatabase  # Call the function from DropDatabase
+                break
                 ;;
             "Exit")
                 echo -e "${blue}Exiting. Goodbye!${clear}"
