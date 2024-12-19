@@ -1,6 +1,6 @@
 #!/bin/bash
 source ./CreateDatabase
-source ./ConnectDatabase
+source ./ConnectDatabase 
 source ./DropDatabase
 source ./ListDatabase 
 
@@ -15,10 +15,13 @@ select option in "Create Database" "List Database" "Connect Database" "Drop Data
             list_database  # Call the function from ListDatabase
             ;;
         "Connect Database")
-            connect_database  # Call the function from ConnectDatabase
+           source ./ConnectDatabase
+            connectDB  
+            break                         
             ;;
         "Drop Database")
-            drop_database  # Call the function from DropDatabase
+            dropDatabase  # Call the function from DropDatabase
+            break
             ;;
         "Exit")
             echo "Exiting... Goodbye!"
@@ -29,4 +32,3 @@ select option in "Create Database" "List Database" "Connect Database" "Drop Data
             ;;
     esac
 done
-
