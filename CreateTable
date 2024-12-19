@@ -23,7 +23,7 @@ function create_table() {
         echo -e "${cyan}>> Enter the number of columns in your table: ${clear}"
         read colNum
         
-        if ! is_empty_input $colNum && ! is_int $colNum && ! is_less_than_zero $colNum ; then
+        if ! is_empty_input $colNum &&  is_int $colNum && ! is_less_than_zero $colNum ; then
             echo -e "${blue}Number of columns [ $colNum ] is valid."
             echo -e "Continuing-----------------------------------${clear}" 
             sleep 0.5

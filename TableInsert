@@ -63,13 +63,11 @@ function insert_table_data() {
 
             if [ "${data_types[$i]}" == "int" ]; then
                 if ! is_int "${values[$i]}"; then
-                    echo -e "${yellow}Warning: Value '${values[$i]}' is not an integer.${clear}"
                     flag=0
                     insert_table_data #try again
                 fi
             elif [ "${data_types[$i]}" == "string" ]; then
                 if ! is_string "${values[$i]}"; then
-                    echo -e "${yellow}Warning: Value '${values[$i]}' is not a string.${clear}"
                     flag=0
                     insert_table_data #try again
                 fi
