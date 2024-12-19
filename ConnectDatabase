@@ -1,13 +1,16 @@
 #!/bin/bash
-connectDB(){
+source ./Common
+
+function connectDB(){
 read -p "Enter database name you want to connect: " connDB
- if [ -e "$connDB" ];
+ if [ -e "$DB_DIR/$connDB" ];
  then
-   cd ./$connDB
+   cd "$DB_DIR/$connDB"
    echo "$connDB is selected"
 
   echo "Current directory: $(pwd)" 
  else
    echo "DB is not selected"
  fi
+ navigate_menu
 }

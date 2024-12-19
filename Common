@@ -1,6 +1,6 @@
 #!/bin/bash
 #global path to database directory
-DB_DIR="/home/hoda/Documents/Bash/Bash Project/Database/"
+DB_DIR="$(pwd)/DataBases"
 
 # Color variables
 red='\033[0;31m'
