@@ -13,7 +13,7 @@ function connectDB(){
    echo "$connDB is selected"
    echo "Current directory: $(pwd)" 
    Ps1="$DB_DIR/$connDB"
-   SelectDB="$connDB"
+   SELECTED_DB="$connDB"
    #tables menu 
    tablesMenu
  else

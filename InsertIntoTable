@@ -6,7 +6,7 @@ source ./Common
 flag=1
 
 # Function to insert data into a table
-function choose_table() {
+function insert_into_table() {
     echo -e "${cyan}>> Enter table name from following list: ${clear}"
     ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"
 
@@ -89,5 +89,3 @@ function insert_table_data() {
         fi
     fi
 }
-cd Database/DB1
-choose_table
