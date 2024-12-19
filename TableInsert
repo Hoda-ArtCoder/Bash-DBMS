@@ -52,17 +52,26 @@ function insert_table_data() {
     if [ $flag -eq 1 ]; then
         # Validate the data types of the input values
         for i in "${!values[@]}"; do
+            if [ $i -eq 0 ]; then
+                # Check uniqueness of the first value (Primary Key)
+                if grep -q "^${values[$i]}:" "$DB_DIR/$SELECTED_DB/$table_name"; then
+                    echo -e "${yellow}Warning: Value '${values[$i]}' already exists as a primary key.${clear}"
+                    flag=0
+                    insert_table_data #try again
+                fi
+            fi
+
             if [ "${data_types[$i]}" == "int" ]; then
                 if ! is_int "${values[$i]}"; then
                     echo -e "${yellow}Warning: Value '${values[$i]}' is not an integer.${clear}"
                     flag=0
-                    insert_table_data
+                    insert_table_data #try again
                 fi
             elif [ "${data_types[$i]}" == "string" ]; then
                 if ! is_string "${values[$i]}"; then
                     echo -e "${yellow}Warning: Value '${values[$i]}' is not a string.${clear}"
                     flag=0
-                    insert_table_data
+                    insert_table_data #try again
                 fi
             fi
         done
@@ -80,5 +89,5 @@ function insert_table_data() {
         fi
     fi
 }
-
-insert_table_data
+cd Database/DB1
+choose_table
