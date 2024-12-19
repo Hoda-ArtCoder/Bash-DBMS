@@ -72,3 +72,19 @@ is_less_than_zero() {
         return 1
     fi
 }
+
+is_int () {
+    if [[ $1 =~ ^[0-9]+$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+is_string () {
+    if [[ $1 =~ ^.+$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
