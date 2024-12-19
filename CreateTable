@@ -1,56 +1,101 @@
 #!/bin/bash
 source ./Validations
+source ./Common
 
+# Declare flag variable to check success of operations
+flag=1
 
-# Input table name
-echo "Enter the name of the table: "
-read tblName
-validate_non_empty "$tblName" "Table name"
+function create_table() {
+    echo -e "${cyan}>> Enter table name: ${clear}" 
+    read tblName
+    if ! is_empty_input "$tblName" && ! is_already_exists_file "$tblName" && ! is_invalid_name "$tblName" ; then
+        echo -e "${blue}Table name [$tblName] is valid------------------"
+        echo -e "Continuing---------------------------------${clear}" 
+        flag=1
+    else
+        echo -e "${yellow}Warning: Invalid table name. Please try again. ${clear}" 
+        flag=0
+        create_table
+    fi
 
-# Check if table exists
-if [ -f "$tblName" ]; #[if there is already a file created named $tblName]
-then
-    echo "Warrning: Table '$tblName' already exists."
-    exit 1
-else
-    touch "$tblName" "$tblName.metadata" #create datafile and metadata file
-    echo "...Table and metadata file created..."
-fi
+    if [ $flag -eq 1 ]; then
+        # Input number of columns-------------------------------
+        echo -e "${cyan}>> Enter the number of columns in your table: ${clear}"
+        read colNum
+        
+        if ! is_empty_input $colNum && ! is_less_than_zero $colNum; then
+            echo -e "${blue}Number of columns [$colNum ] is valid."
+            echo -e "Continuing-----------------------------------${clear}" 
+            sleep 0.5
+            
+            touch "$tblName" "$tblName.metadata"
+            if [[ -f "$tblName" && -f "$tblName.metadata" ]]; then
+                echo -e "${green}Files '$tblName' and '$tblName.metadata' created successfully for table creation.${clear}"
+            else
+                echo -e "${yellow}Warning: Failed to create files '$tblName' and/or '$tblName.metadata'.${clear}"
+                flag=0  # Set the flag to indicate failure
+                create_table  # Retry table creation or handle the error
+            fi
 
-# Input number of columns
-echo "Enter the number of columns: "
-read colNum
-validate_non_empty "$colNum" "Number of columns"
+            flag=1
+            create_columns
+        else
+            echo -e "${yellow}Failed validation checks. Please try again...${clear}"
+            flag=0
+            create_table
+        fi  
+    fi
+}
 
-if [ "$colNum" -le 0 ]; then
-    echo "Warrning: Invalid number of columns."
-    exit 1
-fi
+function create_columns() {
+    # Adding PK column
+    if [ $flag -eq 1 ]; then
+        echo -e "${cyan}>> Enter column name 1 (PRIMARY KEY column) followed by datatype (int/string): e.g. id int ${clear}"
+        read colName colType
+        if ! is_empty_input "$colName" && ! is_invalid_name "$colName" &&  \
+        ! is_empty_input "$colType" && ! is_invalid_datatype "$colType" && \
+        ! is_duplicate_column "$colName" "$tblName.metadata" ; then
+            #adding metadata PK row
+            echo  "$colName:$colType:PK" >> "$tblName.metadata"
+            echo -e "${green}$colName:$colType:PK is added to $tblName.metadata ${clear}"
+            flag=1
+        else
+            echo -e "${yellow}Failed validation checks. Aborting table creation...${clear}"
+            sleep 0.5
+            echo -e "${gray}Deleting files '$tblName' and '$tblName.metadata'${clear}"
+            rm "$tblName" "$tblName.metadata"
+            flag=0
+            sleep 0.5
+            navigate_menu
+        fi
+    fi
 
-# Loop to input columns
-for i in $(seq 1 "$colNum"); #loop through the number of columns
-do
-    echo "Enter the name of column $i followed by its datatype (int/string/float): "
-    read colName colType
-    validate_non_empty "$colName" "Column name"
-    validate_non_empty "$colType" "Datatype"
-    validate_datatype "$colType"
-    validate_unique_column "$colName" "$tblName.metadata"
-    echo "$colName:$colType" >> "$tblName.metadata"
-done
+    if [ $flag -eq 1 ]; then
+        for ((i=2; i<$colNum+1; i++)) # Loop through the number of columns -1 
+        do
+            echo -e "${cyan}>> Enter column name $i followed by datatype (int/string): e.g., name string ${clear}"
+            read colName colType
+            if ! is_empty_input "$colName" && ! is_invalid_name "$colName" &&  \
+            ! is_empty_input "$colType" && ! is_invalid_datatype "$colType" && \
+            ! is_duplicate_column "$colName" "$tblName.metadata" ; then
+                echo "$colName:$colType" >> "$tblName.metadata"
+                echo -e "${green}$colName:$colType is added to $tblName.metadata ${clear}"
+                flag=1
+            else
+                echo -e "${yellow}Failed validation checks. Aborting table creation...${clear}"
+                rm "$tblName" "$tblName.metadata"
+                 flag=0
+                navigate_menu
+            fi
+        done
+    fi
+    if [ $flag -eq 1 ]; then
+        echo -e "${green}------TABLE [ $tblName ] CREATED SUCCESSFULLY-------${clear}"
+        navigate_menu
+    fi
+}
+    
 
-# Set primary key
-echo "Enter the name of the primary key: "
-read primaryKey
-validate_non_empty "$primaryKey" "Primary key"
-validate_primary_key "$primaryKey" "$tblName.metadata"
-
-# Add primary key to metadata
-echo "# Primary key: $primaryKey" >> "$tblName.metadata"
-echo "Primary key set to $primaryKey."
-
-# Log the creation
-logFile="table_creation.log"
-echo "$(date): Created table '$tblName' with $colNum columns. Primary key: $primaryKey" >> "$logFile"
-
-echo "Table created successfully."
+# Temp code for testing .. delete later
+cd Database/DB1
+create_table

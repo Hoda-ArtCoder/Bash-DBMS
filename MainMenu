@@ -3,32 +3,51 @@ source ./CreateDatabase
 source ./ConnectDatabase 
 source ./DropDatabase
 source ./ListDatabase 
+source ./Validations
 
-echo "----------Welcome to the Database Management System---------"
-echo "Choose an option:-------------------------------------------"
-select option in "Create Database" "List Database" "Connect Database" "Drop Database" Exit; do
-    case $option in 
-        "Create Database")
-            create_database # Call the function from CreateDatabase
-            ;;
-        "List Database")
-            list_database  # Call the function from ListDatabase
-            ;;
-        "Connect Database")
-           source ./ConnectDatabase
-            connectDB  
-            break                         
-            ;;
-        "Drop Database")
-            dropDatabase  # Call the function from DropDatabase
-            break
-            ;;
-        "Exit")
-            echo "Exiting... Goodbye!"
-            exit 0  # Exit the script
-            ;;
-        *)
-            echo "Invalid option. Please try again."
-            ;;
-    esac
-done
+function main_menu() {
+    echo -e "${magenta}-- -- -- -- Welcome to the Database Management System -- -- -- --${clear}"
+    PS3=$(echo -e "${cyan}>> Choose an option: ${clear}") # Colorize the prompt
+
+    select option in "Create Database"  "List Database"   "Connect Database" "Drop Database"  "Exit"; do
+        case $option in
+            "Create Database")
+                create_database # Call the function from CreateDatabase
+                ;;
+            "List Database")
+                list_database  # Call the function from ListDatabase
+                ;;
+            "Connect Database")
+                connectDB  
+                break  
+                ;;
+            "Drop Database")
+                dropDatabase  # Call the function from DropDatabase
+                break
+                ;;
+            "Exit")
+                echo -e "${blue}Exiting. Goodbye!${clear}"
+                exit 0  # Exit the script
+                ;;
+            *)
+                echo -e "${yellow}Warning: Invalid option. Please try again.${clear}" 
+                ;;
+        esac
+    done
+}
+
+navigate_menu() {
+    echo -e "${gray}>>Do you want to go back to the main menu? (yes/no) ${clear}"
+    read  user_choice
+    if [[ "yes"  =~ "$user_choice" ]]; then
+         main_menu
+    elif [[ "no"  =~ "$user_choice"  ]]; then
+        echo -e "${blue}Exiting. Goodbye!"
+        exit 0
+    else
+        echo -e "${yellow} Warrning: Invalid option! Please try again. ${clear}"
+        navigate_menu
+    fi
+}
+
+main_menu

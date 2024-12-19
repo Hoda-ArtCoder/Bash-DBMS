@@ -3,9 +3,13 @@ source ./Validations
 source ./Common
 
 function list_database() {
-    echo "The following databases exist:-------------------------------------------------- "
-    #Lists directories in $DB_DIR and removes the trailing slashes from the directory names.
-    ls -F "$DB_DIR" | grep / | tr -d "/"
-
-    navigate_menu
+    if [ -d "$DB_DIR" ]
+    then
+        echo -e "${magenta}-- -- -- -- Databases Lists available -- -- -- --${clear}"
+        ls "$DB_DIR"  
+        navigate_menu
+    else
+        echo -e "${yellow}>>>>> No Databases Found! <<<<<< ${clear}"
+        navigate_menu
+    fi
 }
