@@ -1,33 +1,41 @@
 #!/bin/bash
+source ./Common
+
+
+# Function: Validate empty input
 is_empty_input() {
     if [ -z "$1" ]; then
-        echo "Warning: $1 cannot be empty."
+        echo -e "${yellow}Warning: Input cannot be empty.${clear}"
         return 0
     else
         return 1
     fi
 }
 
+# Function: Check if directory already exists
 is_already_exists_dir() {
     if [ -d "$1" ]; then
-        echo "Warning: $1 already exists."
-        return 0
-    else
-        return 1
-    fi
-}
-is_already_exists_file() {
-    if [ -f "$1" ]; then
-        echo "Warning: $1 already exists."
+        echo -e "${yellow}Warning: Directory '$1' already exists.${clear}"
         return 0
     else
         return 1
     fi
 }
 
+# Function: Check if file already exists
+is_already_exists_file() {
+    if [ -f "$1" ]; then
+        echo -e "${yellow}Warning: File '$1' already exists.${clear}"
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Function: Validate name
 is_invalid_name() {
     if [[ ! $1 =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
-        echo "Warning: Invalid name '$1'. Name must start with a letter or underscore and contain only letters, numbers, and underscores."
+        echo -e "${yellow}Warning: Invalid name '$1'. Name must start with a letter or underscore and contain only letters, numbers, and underscores.${clear}"
         return 0
     else
         return 1
@@ -38,7 +46,7 @@ is_invalid_name() {
 is_invalid_datatype() {
     declare -a arr=("int" "string")
     if [[ ! " ${arr[*]} " =~ " $1 " ]]; then
-        echo "Warning: Invalid datatype '$1'. Valid types are: ${arr[*]}"
+        echo -e "${yellow}Warning: Invalid datatype '$1'. Valid types are: ${arr[*]}.${clear}"
         return 0
     else
         return 1
@@ -48,20 +56,19 @@ is_invalid_datatype() {
 # Function: Validate unique column name
 is_duplicate_column() {
     if grep -q "^$1:" "$2"; then
-        echo "Warning: Column name '$1' already exists in $2."
+        echo -e "${yellow}Warning: Column name '$1' already exists in $2.${clear}"
         return 0
     else
         return 1
     fi
 }
 
-is_less_than_zero () {
+# Function: Validate if value is greater than zero
+is_less_than_zero() {
     if [[ "$1" -le 0 ]]; then
-        echo "Warning: Value must be bigger than zero."
+        echo -e "${yellow}Warning: Value must be greater than zero.${clear}"
         return 0
     else
         return 1
     fi
 }
-
-

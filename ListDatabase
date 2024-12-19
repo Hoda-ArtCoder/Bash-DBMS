@@ -1,14 +1,15 @@
 #!/bin/bash
 source ./Validations
 source ./Common
+
 function list_database() {
     if [ -d "$DB_DIR" ]
     then
-        echo "-- -- -- Databases Lists available -- -- --"
-        ls "$DB_DIR"
+        echo -e "${magenta}-- -- -- -- Databases Lists available -- -- -- --${clear}"
+        ls "$DB_DIR"  
         navigate_menu
     else
-        echo ">>>>> No Databases Found! <<<<<<"
+        echo -e "${yellow}>>>>> No Databases Found! <<<<<< ${clear}"
         navigate_menu
     fi
 }

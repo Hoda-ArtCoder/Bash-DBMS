@@ -2,17 +2,13 @@
 #global path to database directory
 DB_DIR="/home/hoda/Documents/Bash/Bash Project/Database/"
 
-
-navigate_menu() {
-    echo ">>Do you want to go back to the main menu? (yes/no)"
-    read user_choice
-    if [[ "yes"  =~ "$user_choice" ]]; then
-         ./MainMenu
-    elif [[ "no"  =~ "$user_choice"  ]]; then
-        echo "Exiting. Goodbye!"
-        exit 0
-    else
-        echo "Invalid option! Please try again."
-        navigate_menu
-    fi
-}
+# Color variables
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;93m'
+blue='\033[0;94m'
+magenta='\033[0;95m'
+cyan='\033[0;96m'
+gray='\033[0;37m'
+# Clear the color after that
+clear='\033[0m'
