@@ -27,4 +27,3 @@ function create_database() {
     fi
     navigate_menu
 }
-

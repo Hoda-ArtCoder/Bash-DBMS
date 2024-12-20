@@ -1,3 +1,117 @@
 #! /bin/bash
+source ./Validations
+source ./Common
 
-function deleteFromTable(){}
+# Function to delete from a table
+function deleteFromTable() {
+    # Get the list of tables in the database
+    tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
+    if [[ ${#tables[@]} -eq 0 ]]; then
+        echo -e "${red}No tables found in the selected database.${clear}"
+        return
+    fi
+
+    # Display the table selection menu
+    echo -e "${cyan}>> Select a table from the following list: ${clear}"
+    PS3="Enter the number corresponding to your choice: "
+
+    select table_name in "${tables[@]}"; do
+        if [[ -n "$table_name" ]]; then
+            echo -e "${blue}You selected table: $table_name${clear}"
+            delete_from_table_menu "$table_name"
+            break
+        else
+            echo -e "${red}Invalid choice. Please select a valid number.${clear}"
+        fi
+    done
+
+    tablesMenu
+}
+
+# Function to display delete options
+function delete_from_table_menu() {
+    echo -e "${cyan}What would you like to delete from table '$1'?${clear}"
+    select option in "Delete row by column value" "Clear column" "Delete all rows" "Go back"; do
+        case $option in
+            "Delete row by column value")
+                delete_row_by_column_value "$1"
+                ;;
+            "Clear column")
+                clear_column "$1"
+                ;;
+            "Delete all rows")
+                delete_all_rows "$1"
+                ;;
+            "Go back")
+                return
+                ;;
+            *)
+                echo -e "${red}Warning: Invalid option. Please try again.${clear}"
+                ;;
+        esac
+    done
+}
+
+# Function to delete rows based on column value
+function delete_row_by_column_value() {
+    table_file="$DB_DIR/$SELECTED_DB/$1"
+    metadata_file="${table_file}.metadata"
+
+    if [[ ! -f "$metadata_file" ]]; then
+        echo -e "${red}Metadata file for table '$1' not found.${clear}"
+        return
+    fi
+
+    read -p "Enter the column name: " column_name
+    column_index=$(grep -n "^$column_name:" "$metadata_file" | cut -d: -f1)
+
+    if [[ -z "$column_index" ]]; then
+        echo -e "${red}Warning: Column name '$column_name' does not exist.${clear}"
+        return
+    fi
+
+    read -p "Enter the value to match for deletion: " value
+    awk -F':' -v col="$column_index" -v val="$value" 'NR == 1 || $col != val' "$table_file" > tmp && mv tmp "$table_file"
+    echo -e "${green}Rows where '$column_name=$value' deleted successfully.${clear}"
+}
+
+# Function to clear all values in a specific column
+function clear_column() {
+    table_file="$DB_DIR/$SELECTED_DB/$1"
+    metadata_file="${table_file}.metadata"
+
+    if [[ ! -f "$metadata_file" ]]; then
+        echo -e "${red}Metadata file for table '$1' not found.${clear}"
+        return
+    fi
+
+    read -p "Enter the column name to clear: " column_name
+    column_index=$(grep -n "^$column_name:" "$metadata_file" | cut -d: -f1)
+
+    if [[ -z "$column_index" ]]; then
+        echo -e "${red}Warning: Column name '$column_name' does not exist.${clear}"
+        return
+    fi
+
+    awk -F':' -v col="$column_index" '{
+        for (i = 1; i <= NF; i++) {
+            if (i == col) $i = ""
+        }
+        print $0
+    }' "$table_file" > tmp && mv tmp "$table_file"
+    echo -e "${green}Column '$column_name' cleared successfully.${clear}"
+}
+
+# Function to delete all rows in a table
+function delete_all_rows() {
+    table_file="$DB_DIR/$SELECTED_DB/$1"
+
+    if [[ ! -f "$table_file" ]]; then
+        echo -e "${red}Warning: Table '$1' does not exist.${clear}"
+        return
+    fi
+
+    #delete all rows
+    truncate -s 0 "$table_file"
+    echo -e "${green}All rows deleted successfully. Table structure retained.${clear}"
+}

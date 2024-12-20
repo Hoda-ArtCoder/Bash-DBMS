@@ -5,6 +5,7 @@ source ./TableSelect
 source ./TableDrop
 source ./TableInsert    
 source ./TableUpdate
+source ./TableDeleteFrom
 
 function tablesMenu(){
     echo -e "${magenta}--------------------Welcome to $connDB-------------------------${clear}"
