@@ -1,0 +1,25 @@
+#! /bin/bash
+source ./Common
+
+function dropTable(){
+  # Ensure user is connected to db
+  if [ -z "$SELECTED_DB" ]; then
+    echo -e "${red}Error: No database selected. Please connect to a database first.${clear}"
+    return
+  fi
+
+  read -p "Enter table name you want to drop: " tblName
+
+  tablePath="$DB_DIR/$SELECTED_DB/$tblName"
+  metadataPath="$DB_DIR/$SELECTED_DB/$tblName.metadata"
+
+  if [ ! -e "$tablePath" ] || [ ! -e "$metadataPath" ]; then
+    echo -e "${red}Error: Table '$tblName' does not exist in database '$SELECTED_DB'.${clear}"
+    return
+  fi
+
+    rm "$tablePath" "$metadataPath"
+    echo -e "${green}Table '$tblName' dropped successfully from database '$SELECTED_DB'.${clear}"
+    
+ navigate_menu
+}

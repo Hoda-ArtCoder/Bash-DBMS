@@ -1,11 +1,14 @@
 #!/bin/bash
+source ./Common
+
 dropDatabase(){
 read -p "Enter database name you want to drop: " dropdb
- if [ -e "$dropdb" ]
+ if [ -e "$DB_DIR/$dropdb" ]
  then
-   rm -r "$dropdb"
-   echo "$dropdb is dropped"
+   rm -r "$DB_DIR/$dropdb"
+   echo -e "${yellow}$dropdb is dropped${clear}"
  else
-   echo "DB is not exist"
+   echo -e "${red}DB $dropdb is not exist${clear}"
  fi
+ navigate_menu
 }
