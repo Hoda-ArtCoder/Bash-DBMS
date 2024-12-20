@@ -3,15 +3,20 @@ source ./Common
 source ./TablesMenu
 
 function connectDB(){
-  echo -e "${cyan}>> Enter database name you want to connect: ${clear}" 
-  ls "$DB_DIR" 
+  echo -e "${cyan}>> Enter database name you want to connect from the following list: ${clear}" 
+  #List databases available with yellow text
+  for item in "$DB_DIR"/*; do
+    baseItem=$(basename "$item") #removes all path except file/dir name.
+    echo -e "${yellow}Available Databases: $baseItem${clear}"
+  done
+
   read connDB
 
  if [ -e "$DB_DIR/$connDB" ];
  then
    cd "$DB_DIR/$connDB"
-   echo "$connDB is selected"
-   echo "Current directory: $(pwd)" 
+   echo -e "${yellow}$connDB is selected${clear}"
+   echo -e "${yellow}Current directory: $(pwd)${clear}" 
    Ps1="$DB_DIR/$connDB"
    SELECTED_DB="$connDB"
    #tables menu 
