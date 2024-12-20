@@ -8,10 +8,10 @@ function create_database() {
     echo -e ${cyan}">>Enter the name of the database you want to create: ${clear}"
     read dbName
     #checking validations
-    if ! is_empty_input "$dbName" && ! is_already_exists_dir "$dbName" && ! is_invalid_name "$dbName"; then
+    if ! is_empty_input "$dbName" && ! is_already_exists_dir "$dbName" &&  is_valid_name "$dbName"; then
         echo -e ${blue}"Processing...."
         sleep 0.5
-        echo -e "Database name [ $dbName ] is valid to create. ${clear}"
+        echo -e "Database name [ $dbName ] is valid to create.${clear}"
         flag=1
     else
         flag=0
