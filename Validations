@@ -66,18 +66,18 @@ is_duplicate_column() {
 # Function: Validate if value is greater than zero
 is_less_than_zero() {
     if [[ "$1" -le 0 ]]; then
+        return 1
+    else
         echo -e "${yellow}Warning: Value must be greater than zero.${clear}"
         return 0
-    else
-        return 1
     fi
 }
 
 is_int () {
     if [[ $1 =~ ^[0-9]+$ ]]; then
-        echo -e "${yellow}Warning: Value must be an integer.${clear}"
         return 1
     else
+        echo -e "${yellow}Warning: Value must be an integer.${clear}"
         return 0
     fi
 }
