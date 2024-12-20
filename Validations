@@ -84,9 +84,9 @@ is_int () {
 
 is_string () {
     if [[ $1 =~ ^.+$ ]]; then
-        echo -e "${yellow}Warning: Value must be a string.${clear}"
         return 1
     else
+        echo -e "${yellow}Warning: Value must be a string.${clear}"
         return 0
     fi
 }
