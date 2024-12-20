@@ -75,16 +75,18 @@ is_less_than_zero() {
 
 is_int () {
     if [[ $1 =~ ^[0-9]+$ ]]; then
-        return 0
-    else
+        echo -e "${yellow}Warning: Value must be an integer.${clear}"
         return 1
+    else
+        return 0
     fi
 }
 
 is_string () {
     if [[ $1 =~ ^.+$ ]]; then
-        return 0
-    else
+        echo -e "${yellow}Warning: Value must be a string.${clear}"
         return 1
+    else
+        return 0
     fi
 }

@@ -1,0 +1,85 @@
+#! /bin/bash
+source ./Validations
+source ./Common
+
+# Set initial flag value to 1
+flag=1
+
+# Function to select a table
+function select_from_table() {
+    # Get the list of tables in the database
+    tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
+    if [[ ${#tables[@]} -eq 0 ]]; then
+        echo -e "${yellow}No tables found in the selected database.${clear}"
+        return
+    fi
+
+    # Display the select menu
+    echo -e "${cyan}>> Select a table from the following list: ${clear}"
+    PS3="Enter the number corresponding to your choice: "
+
+    select table_name in "${tables[@]}"; do
+        if [[ -n "$table_name" ]]; then
+            echo -e "${blue}You selected table: $table_name${clear}"
+            select_table_data "$table_name"
+            break
+        else
+            echo -e "${yellow}Invalid choice. Please select a valid number.${clear}"
+        fi
+    done
+}
+
+# Function to handle table data options
+function select_table_data() {
+    echo -e "${cyan}What would you like to do with the table '$1'?${clear}"
+    select option in "Select all rows" "Select specific row" "Go back"; do
+        case $option in
+            "Select all rows")
+                read_rows "$1"
+                ;;
+            "Select specific row")
+                read_rows_by_specific_column "$1"
+                ;;
+            "Go back")
+                main_menu
+                ;;
+            *)
+                echo -e "${yellow}Warning: Invalid option. Please try again.${clear}"
+                ;;
+        esac
+    done
+}
+
+# Function to read all rows from a table
+function read_rows() {
+    if [[ -f "$DB_DIR/$SELECTED_DB/$1" ]]; then
+        echo -e "${cyan}Data from table '$1':${clear}"
+        cat "$DB_DIR/$SELECTED_DB/$1"
+    else
+        echo -e "${yellow}Warning: Table '$1' does not exist.${clear}"
+    fi
+}
+
+# Function to read rows by specific column value
+function read_rows_by_specific_column() {
+    # Ensure metadata file exists
+    if [[ ! -f "$DB_DIR/$SELECTED_DB/$1.metadata" ]]; then
+        echo -e "${yellow}Warning: Metadata file for table '$1' not found.${clear}"
+        return
+    fi
+
+    read -p "Enter the column name: " column_name
+    # Check if column name exists in metadata file
+    if grep -q "^$column_name:" "$DB_DIR/$SELECTED_DB/$1.metadata"; then
+        read -p "Enter the value: " value
+        data=$(grep "^$column_name:$value:" "$DB_DIR/$SELECTED_DB/$1")
+        if [[ -n "$data" ]]; then
+            echo -e "${cyan}Data from table '$1' matching '$column_name = $value':${clear}"
+            echo -e "$data"
+        else
+            echo -e "${yellow}No matching data found.${clear}"
+        fi
+    else
+        echo -e "${yellow}Warning: Column name '$column_name' does not exist.${clear}"
+    fi
+}

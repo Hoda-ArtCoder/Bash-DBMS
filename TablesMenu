@@ -1,8 +1,10 @@
 #! /bin/bash
 source ./CreateTable
-source ./ListTables
-source ./DropTable
-source ./InsertIntoTable
+source ./TableList
+source ./TableSelect
+source ./TableDrop
+source ./TableInsert    
+source ./TableUpdate
 
 function tablesMenu(){
     echo -e "${magenta}--------------------Welcome to $connDB-------------------------${clear}"
