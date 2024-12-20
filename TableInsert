@@ -1,29 +1,45 @@
 #!/bin/bash
 source ./Validations
 source ./Common
+source ./TablesMenu
 
 # Set initial flag value to 1
 flag=1
 
 # Function to insert data into a table
 function insert_into_table() {
-    echo -e "${cyan}>> Enter table name from following list: ${clear}"
-    ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"
+    # List tables in the selected database (excluding metadata files)
+    tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
 
-    read table_name
+    # Check if there are any tables
+    if [ ${#tables[@]} -eq 0 ]; then
+        echo "No tables found in the selected database."
+        tablesMenu
+    fi
+
+    # Display menu to select a table
+    echo -e "${cyan}>> Select a table from the following list:${clear}"
+    select table_name in "${tables[@]}"; do
+        if [ -n "$table_name" ]; then
+            echo -e "${blue} You selected table: $table_name ${clear}"
+            sleep 0.5
+            break
+        else
+            echo -e "Warrning: ${yellow} Invalid choice. Please select a valid table number. ${clear}"
+        fi
+    done
 
     # Check if the table and its metadata exist
     if [ -e "$DB_DIR/$SELECTED_DB/$table_name" ] && [ -e "$DB_DIR/$SELECTED_DB/$table_name.metadata" ]; then
         echo -e "${blue}Table [ $table_name ] exists$"
         echo -e "Continuing...............${clear}"
-        flag=1
         sleep 0.5
         #calling function
         insert_table_data $table_name
     else
         echo -e "${yellow}Warning: Table '$table_name' does not exist or corrupted.${clear}"
         flag=0
-        navigate_menu  
+        tablesMenu  
     fi
 }
 
@@ -32,8 +48,11 @@ function insert_table_data() {
     column_names=($(cut -d ':' -f 1 "$DB_DIR/$SELECTED_DB/$table_name.metadata"))
     data_types=($(cut -d ':' -f 2 "$DB_DIR/$SELECTED_DB/$table_name.metadata"))
 
-    echo -e "${gray}Column names: ${column_names[@]} ${clear}"
-    echo -e "${gray}Data types: ${data_types[@]} ${clear}"
+    #displaying columns with types
+    for i in "${!column_names[@]}"; do
+        columns_with_types+="${column_names[i]} (${data_types[i]}) "
+    done
+    echo -e "${gray}${columns_with_types}${clear}"
 
     echo -e "${cyan}Insert data in the order of columns (space-separated): ${clear}"
     read -a values  # Array to store user input values
@@ -41,13 +60,9 @@ function insert_table_data() {
     # Check if the number of input values matches the number of columns
     if [ ${#values[@]} -ne ${#column_names[@]} ]; then
         echo -e "${yellow}Warning: The number of values does not match the number of columns."
-        echo -e "${gray}Try again.${clear}"
         flag=0
         insert_table_data
-    else
-        flag=1
     fi
-
 
     if [ $flag -eq 1 ]; then
         # Validate the data types of the input values
@@ -79,7 +94,7 @@ function insert_table_data() {
             #checking the exit status of the previous command. If the exit status is equal to 0, it means the previous command was successful.
             if [ $? -eq 0 ]; then
                 echo -e "${green}DATA INSERTED INTO TABLE '$table_name' SUCCESSFULLY.${clear}"
-                navigate_menu
+                tablesMenu
             else
                 echo -e "${yellow}Warning: Failed to insert data into the table.${clear}"
                 insert_table_data
