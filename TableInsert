@@ -2,7 +2,6 @@
 source ./Validations
 source ./Common
 
-
 # Set initial flag value to 1
 flag=1
 
@@ -13,27 +12,25 @@ function insert_into_table() {
 
     # Check if there are any tables
     if [ ${#tables[@]} -eq 0 ]; then
-        echo "No tables found in the selected database."
+        echo -e "{$blue}No tables found...${clear}"
         tablesMenu
     fi
 
-    # Display menu to select a table
-    echo -e "${cyan}>> Select a table from the following list:${clear}"
+    echo -e "${cyan}Select a table from the following list:${clear}"
     select table_name in "${tables[@]}"; do
         if [ -n "$table_name" ]; then
-            echo -e "${blue} You selected table: $table_name ${clear}"
+            echo -e "${blue}You selected table: $table_name ${clear}"
             sleep 0.5
             break
         else
-            echo -e "Warrning: ${yellow} Invalid choice. Please select a valid table number. ${clear}"
+            echo -e "${yellow} Warrning: Invalid choice. Please select a valid table number. ${clear}"
+            flag=0
         fi
     done
 
     # Check if the table and its metadata exist
     if [ -e "$DB_DIR/$SELECTED_DB/$table_name" ] && [ -e "$DB_DIR/$SELECTED_DB/$table_name.metadata" ]; then
-        echo -e "${blue}Table [ $table_name ] exists$"
-        echo -e "Continuing...............${clear}"
-        sleep 0.5
+        echo -e "${blue}Continuing...............${clear}"
         #calling function
         insert_table_data $table_name
     else
@@ -48,19 +45,30 @@ function insert_table_data() {
     column_names=($(cut -d ':' -f 1 "$DB_DIR/$SELECTED_DB/$table_name.metadata"))
     data_types=($(cut -d ':' -f 2 "$DB_DIR/$SELECTED_DB/$table_name.metadata"))
 
+    # Check if table has no columns 
+    if [ ${#column_names[@]} -eq 0 ]; then
+        echo -e "${blue}Table '$table_name' has no columns.${clear}"
+        sleep 0.5
+        echo -e "${blue}Aborting insertion.${clear}"
+        flag=0
+        tablesMenu
+    fi
+    columns_with_types=""
     #displaying columns with types
     for i in "${!column_names[@]}"; do
         columns_with_types+="${column_names[i]} (${data_types[i]}) "
     done
-    echo -e "${gray}${columns_with_types}${clear}"
 
-    echo -e "${cyan}Insert data in the order of columns (space-separated): ${clear}"
+    echo -e "${cyan}Insert data in the order of columns (space-separated):"
+    echo -e "${cyan}${columns_with_types}${clear}"
     read -a values  # Array to store user input values
+    #####################################################################
+
 
     # Check if the number of input values matches the number of columns
     if [ ${#values[@]} -ne ${#column_names[@]} ]; then
-        echo -e "${yellow}Warning: The number of values does not match the number of columns."
-        flag=0
+        echo -e "${yellow}Warning: The number of values does not match the number of columns.${clear}"
+        flag=1
         insert_table_data
     fi
 
@@ -71,30 +79,37 @@ function insert_table_data() {
                 # Check uniqueness of the first value (Primary Key)
                 if grep -q "^${values[$i]}:" "$DB_DIR/$SELECTED_DB/$table_name"; then
                     echo -e "${yellow}Warning: Value '${values[$i]}' already exists as a primary key.${clear}"
-                    flag=0
+                    flag=1
                     insert_table_data #try again
+                fi
+                if { [ "${data_types[$i]}" == "int" ] && ! is_int "${values[$i]}"; } || { [ "${data_types[$i]}" == "string" ] && ! is_string "${values[$i]}"; }; then
+                    echo -e "${yellow}Warning: Invalid data type for column '${column_names[$i]}'.${clear}"
+                    flag=1
+                    insert_table_data
                 fi
             fi
 
-            if [ "${data_types[$i]}" == "int" ]; then
-                if ! is_int "${values[$i]}"; then
-                    flag=0
-                    insert_table_data #try again
-                fi
-            elif [ "${data_types[$i]}" == "string" ]; then
-                if ! is_string "${values[$i]}"; then
-                    flag=0
-                    insert_table_data #try again
-                fi
+            if { [ "${data_types[$i]}" == "int" ] && ! is_int "${values[$i]}"; } || { [ "${data_types[$i]}" == "string" ] && ! is_string "${values[$i]}"; }; then
+                echo -e "${yellow}Warning: Invalid data type for column '${column_names[$i]}'.${clear}"
+                flag=1
+                insert_table_data
             fi
+
         done
 
         if [ $flag -eq 1 ]; then
-            echo "${values[@]}" >> "$DB_DIR/$SELECTED_DB/$table_name"
+            #s/ /:/g: Substitutes all spaces with (:)
+            echo "${values[@]}" | sed 's/ /:/g' >> "$DB_DIR/$SELECTED_DB/$table_name"
             #checking the exit status of the previous command. If the exit status is equal to 0, it means the previous command was successful.
             if [ $? -eq 0 ]; then
                 echo -e "${green}DATA INSERTED INTO TABLE '$table_name' SUCCESSFULLY.${clear}"
-                tablesMenu
+                echo -e "${gray}Do you want to insert another row (y/n)? ${clear}"
+                read choice
+                if [ "$choice" == "y" ]; then
+                    insert_table_data
+                else
+                    tablesMenu
+                fi
             else
                 echo -e "${yellow}Warning: Failed to insert data into the table.${clear}"
                 insert_table_data
