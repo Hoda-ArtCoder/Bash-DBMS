@@ -1,18 +1,6 @@
 #!/bin/bash
 source ./Common
 
-#dropDatabase(){
-#read -p "Enter database name you want to drop: " dropdb
-# if [ -e "$DB_DIR/$dropdb" ]
-# then
-#   rm -r "$DB_DIR/$dropdb"
-#   echo -e "${yellow}$dropdb is dropped${clear}"
-# else
-#   echo -e "${red}DB $dropdb is not exist${clear}"
-# fi
-# navigate_menu
-#}
-
 drop_database () {
   if is_array_empty "${DATABASES_ARR[@]}"; then
       echo -e "${blue}No databases found in the directory."

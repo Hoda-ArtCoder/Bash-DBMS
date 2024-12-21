@@ -1,25 +1,66 @@
 #! /bin/bash
 source ./Common
 
-function dropTable(){
+function drop_table(){
   # Ensure user is connected to db
   if [ -z "$SELECTED_DB" ]; then
     echo -e "${red}Error: No database selected. Please connect to a database first.${clear}"
     return
   fi
 
-  read -p "Enter table name you want to drop: " tblName
+  #dir containing tables
+  dbDirPath="$DB_DIR/$SELECTED_DB"
+  
+  #get only folders in the directory
+  #awk '{print $NF}': Prints the last field (the name of the directory) from each line of the output.
+  #-l long format, -d directories -v invert matches 
+  TABLES_ARR=($(ls -l "$dbDirPath" | grep -v ".metadata" | awk '{print $NF}'))
 
-  tablePath="$DB_DIR/$SELECTED_DB/$tblName"
-  metadataPath="$DB_DIR/$SELECTED_DB/$tblName.metadata"
-
-  if [ ! -e "$tablePath" ] || [ ! -e "$metadataPath" ]; then
-    echo -e "${red}Error: Table '$tblName' does not exist in database '$SELECTED_DB'.${clear}"
-    return
-  fi
-
-    rm "$tablePath" "$metadataPath"
-    echo -e "${green}Table '$tblName' dropped successfully from database '$SELECTED_DB'.${clear}"
-    
- navigate_menu
+  echo -e "${magenta}-- -- -- --Drop a Table-- -- -- --${clear}"
+  PS3=$(echo -e "${cyan}>> Select a table from the above list: ${clear}")
+  select table_name in "${TABLES_ARR[@]}"; do
+      if [[ -n "$table_name" ]]; then
+          echo -e "${blue}Are you sure you want to drop ${magenta}$table_name${blue}?"
+          echo -e "${yellow}Warrning: This action cannot be undone. (yes/no) ${clear}"
+          read user_choice
+          if [[ "yes"  =~ "$user_choice" ]]; then
+              rm -r "$DB_DIR/$SELECTED_DB/$table_name"
+              rm -r "$DB_DIR/$SELECTED_DB/$table_name.metadata"
+              # Update the TABLES_ARR
+              TABLES_ARR=($(ls -l "$DB_DIR/$SELECTED_DB" | grep -v ".metadata" | awk '{print $NF}'))
+              echo -e "${green}TABLE${magenta} $table_name ${green}DROPPED SUCCESSFULLY.${clear}"
+              break
+          else
+              echo -e "${yellow}Aborting table drop.${clear}"
+              break
+          fi
+      else
+          echo -e "${yellow}Warning: Invalid choice. Please select a valid number.${clear}"
+      fi
+  done
+  tablesMenu
 }
+
+
+#function drop_table(){
+#  # Ensure user is connected to db
+#  if [ -z "$SELECTED_DB" ]; then
+#    echo -e "${red}Error: No database selected. Please connect to a database first.${clear}"
+#    return
+#  fi
+#
+#  read -p "Enter table name you want to drop: " tblName
+#
+#  tablePath="$DB_DIR/$SELECTED_DB/$tblName"
+#  metadataPath="$DB_DIR/$SELECTED_DB/$tblName.metadata"
+#
+#  if [ ! -e "$tablePath" ] || [ ! -e "$metadataPath" ]; then
+#    echo -e "${red}Error: Table '$tblName' does not exist in database '$SELECTED_DB'.${clear}"
+#    return
+#  fi
+#
+#    rm "$tablePath" "$metadataPath"
+#    echo -e "${green}Table '$tblName' dropped successfully from database '$SELECTED_DB'.${clear}"
+#    
+# navigate_menu
+#}

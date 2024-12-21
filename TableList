@@ -4,19 +4,19 @@ source ./Common
 function listTables(){
   #ensure user is connected to db
   if [ -z "$SELECTED_DB" ]; then
-    echo -e "${red}Error: No database selected. Please connect to a database first.${clear}"
+    echo -e "${yellow}Error: No database selected. Please connect to a database first.${clear}"
     return
   fi
 
   #dir containing tables
   dbDirPath="$DB_DIR/$SELECTED_DB"
   
-  echo -e "${magenta}----------Available Tables List-----------${clear}"
+  echo -e "${magenta}-- -- -- --Available Tables in $SELECTED_DB-- -- -- ${clear}"
   
   for file in "$dbDirPath"/*; do
     if [[ "$file" != *.metadata ]]; then
       tableName=$(basename "$file")
-      echo -e "${yellow}$tableName${clear}"
+      echo -e "${blue}$tableName${clear}"
     fi
   done
 

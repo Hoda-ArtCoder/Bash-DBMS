@@ -29,7 +29,7 @@ function tablesMenu(){
                 updateTable
                 ;;
             "Drop Table")
-                dropTable
+                drop_table
                 break
                 ;;
             "Delete from Table")
