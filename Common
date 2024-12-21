@@ -16,7 +16,6 @@ gray='\033[0;37m'
 clear='\033[0m'
 
 
-
 function simulate_search() {
     # Simulate typing the dots one by one
     for i in {1..5}; do

@@ -18,7 +18,7 @@ function main_menu() {
                 list_database  # Call the function from ListDatabase
                 ;;
             "Connect Database")
-                connectDB  
+                connect_to_database  
                 break  
                 ;;
             "Drop Database")

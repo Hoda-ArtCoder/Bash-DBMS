@@ -9,9 +9,9 @@ function create_database() {
     read dbName
     #checking validations
     if ! is_empty_input "$dbName" && ! is_already_exists_dir "$dbName" &&  is_valid_name "$dbName"; then
-        echo -e ${blue}"Processing...."
+        echo -e "${blue}Processing...."
         sleep 0.5
-        echo -e "Database name [ $dbName ] is valid to create.${clear}"
+        echo -e "Database name ${magenta}[ $dbName ]${blue} is valid to create.${clear}"
         flag=1
     else
         flag=0
@@ -20,7 +20,7 @@ function create_database() {
 
     if [ "$flag" -eq 1 ]; then
         if mkdir "$DB_DIR/$dbName"; then
-            echo -e ${green}"---------DATABASE '$dbName' CREATED SUCCESSFULLY----------"
+            echo -e ${green}"---------DATABASE ${magenta}[ $dbName ]${green} CREATED SUCCESSFULLY----------"
         else
             echo -e ${red}"Could not create database '$dbName'."
         fi

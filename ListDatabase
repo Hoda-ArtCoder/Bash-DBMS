@@ -6,7 +6,12 @@ function list_database() {
     if [ -d "$DB_DIR" ]
     then
         echo -e "${magenta}-- -- -- -- Databases Lists available -- -- -- --${clear}"
-        ls "$DB_DIR"  
+        databases_arr=($(ls -l "$DB_DIR" | grep '^d' | awk '{print $NF}'))
+
+        # Loop through the array and print each item on a new line
+        for database in "${databases_arr[@]}"; do
+            echo -e "${blue}$database${clear} "
+        done
         navigate_menu
     else
         echo -e "${yellow}>>>>> No Databases Found! <<<<<< ${clear}"

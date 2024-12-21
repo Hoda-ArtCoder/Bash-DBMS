@@ -1,5 +1,5 @@
 #! /bin/bash
-source ./CreateTable
+source ./TableCreate
 source ./TableList
 source ./TableSelect
 source ./TableDrop
@@ -8,10 +8,10 @@ source ./TableUpdate
 source ./TableDeleteFrom
 
 function tablesMenu(){
-    echo -e "${magenta}--------------------Welcome to $connDB-------------------------${clear}"
+    echo -e "${magenta}-- -- -- --Welcome to $SELECTED_DB-- -- -- --${clear}"
     PS3=$(echo -e "${cyan}>> Choose an option: ${clear}") # Colorize the prompt
 
-    select option in "Create Table" "Insert into Table" "List Tables" "Select from Table" "Update Table" "Drop Table" "Delete from Table" "Exit"; do
+    select option in "Create Table" "Insert into Table" "List Tables" "Select from Table" "Update Table" "Drop Table" "Delete from Table" "Back to Main Menu" "Exit"; do
         case $option in
             "Create Table")
                 create_table
@@ -34,6 +34,9 @@ function tablesMenu(){
                 ;;
             "Delete from Table")
                 deleteFromTable
+                ;;
+            "Back to Main Menu")
+                main_menu
                 ;;
             "Exit")
                 echo -e "${blue}Exiting. Goodbye!${clear}"

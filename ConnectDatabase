@@ -2,27 +2,26 @@
 source ./Common
 source ./TablesMenu
 
-function connectDB(){
-  echo -e "${cyan}>> Enter database name you want to connect from the following list: ${clear}" 
-  #List databases available with yellow text
-  for item in "$DB_DIR"/*; do
-    baseItem=$(basename "$item") #removes all path except file/dir name.
-    echo -e "${yellow}Available Databases: $baseItem${clear}"
-  done
+function connect_to_database() {
 
-  read connDB
-
- if [ -e "$DB_DIR/$connDB" ];
- then
-   cd "$DB_DIR/$connDB"
-   echo -e "${yellow}$connDB is selected${clear}"
-   echo -e "${yellow}Current directory: $(pwd)${clear}" 
-   Ps1="$DB_DIR/$connDB"
-   SELECTED_DB="$connDB"
-   #tables menu 
-   tablesMenu
- else
-   echo "DB is not selected"
- fi
- #navigate_menu
+  #get only folders in the directory
+  #awk '{print $NF}': Prints the last field (the name of the directory) from each line of the output.
+  databases_arr=($(ls -l "$DB_DIR" | grep '^d' | awk '{print $NF}'))
+  if is_array_empty "${databases_arr[@]}"; then
+      echo "No databases found in the directory."
+      return
+  else
+      echo -e "${magenta}-- -- -- --Connect to a Database-- -- -- --${clear}"
+      PS3=$(echo -e "${cyan}>> Select a database from the following list: ${clear}")
+      select database_name in "${databases_arr[@]}"; do
+          if [[ -n "$database_name" ]]; then
+              SELECTED_DB=$database_name
+              echo -e "${green}CONNECTED TO DATABASE:${magenta} $database_name${clear}"
+              break
+          else
+              echo -e "${yellow}Warning: Invalid choice. Please select a valid number.${clear}"
+          fi
+      done
+      tablesMenu
+  fi
 }
