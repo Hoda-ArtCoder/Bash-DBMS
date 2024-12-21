@@ -2,7 +2,8 @@
 #global path to database directory
 DB_DIR="$(pwd)/DataBases"
 SELECTED_DB=""
-
+SELECTED_TABLE=""
+COLUMNS=""
 # Color variables
 red='\033[0;31m'
 green='\033[0;32m'
@@ -13,3 +14,15 @@ cyan='\033[0;96m'
 gray='\033[0;37m'
 # Clear the color after that
 clear='\033[0m'
+
+
+
+function simulate_search() {
+    # Simulate typing the dots one by one
+    for i in {1..5}; do
+        sleep 0.5
+        echo -n -e "${gray}. ${clear}"  # Print a dot without a newline
+    done
+    # Print a newline after the dots
+    echo 
+}
