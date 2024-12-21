@@ -9,7 +9,8 @@ flag=1
 function create_table() {
     echo -e "${cyan}>> Enter table name: ${clear}" 
     read tblName
-    if ! is_empty_input "$tblName" && ! is_already_exists_file "$tblName" && is_valid_name "$tblName"; then
+    
+    if ! is_empty_input "$tblName" && ! is_already_exists_file "$DB_DIR/$SELECTED_DB/$tblName" && is_valid_name "$tblName"; then
     echo -e "${blue}Table name [ $tblName ] is valid------------------"
     sleep 0.5
     echo -e "Continuing---------------------------------${clear}" 
