@@ -92,3 +92,29 @@ is_string () {
         return 1
     fi
 }
+
+function is_valid_table () {
+    # Check if the table and its metadata exist
+    if [ -e "$DB_DIR/$SELECTED_DB/$SELECTED_TABLE" ] && [ -e "$DB_DIR/$SELECTED_DB/$SELECTED_TABLE.metadata" ]; then
+        # Check if columns are available
+        if [ ${#COLUMNS[@]} -eq 0 ]; then
+            sleep 0.5
+            echo -e "${yellow}No columns found in metadata file for table '$table_name'.${clear}"
+            sleep 0.5
+            return -1
+        else
+            return 0
+        fi
+    else
+        echo -e "${yellow}Warning: Table '$SELECTED_TABLE' does not exist or corrupted.${clear}"
+        return -1
+    fi
+}
+
+function is_array_empty() {
+    local array_name=("$@")  
+    if [[ ${#array_name[@]} -eq 0 ]]; then
+        return 0  # Return (0)(true) if the array is empty
+    fi
+    return 1  # Return (1)(false) if the array is not empty
+}

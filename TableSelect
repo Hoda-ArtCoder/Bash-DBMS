@@ -2,84 +2,135 @@
 source ./Validations
 source ./Common
 
-# Set initial flag value to 1
+columns=()
 flag=1
-
-# Function to select a table
+# Function to select data from a table
 function select_from_table() {
-    # Get the list of tables in the database
-    tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
-    if [[ ${#tables[@]} -eq 0 ]]; then
-        echo -e "${yellow}No tables found in the selected database.${clear}"
-        return
+    echo -e "${magenta}-- -- -- --Table Selection in $connDB -- -- -- --${clear}"
+    columns=()
+    #arr to store tables
+    tables_arr=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata")) #-v invert matches [select all files except .metadata]
+
+    if is_array_empty "${tables_arr[@]}"; then
+        echo -e "${blue}No tables found in the ${SELECTED_DB}.${clear}"
+        sleep 0.5
+        echo -e "${blue}Aborting selection.......${clear}"
+        sleep 0.5
+        flag=0
+        tablesMenu
     fi
 
-    # Display the select menu
-    echo -e "${cyan}>> Select a table from the following list: ${clear}"
-    PS3="Enter the number corresponding to your choice: "
-
-    select table_name in "${tables[@]}"; do
-        if [[ -n "$table_name" ]]; then
-            echo -e "${blue}You selected table: $table_name${clear}"
-            select_table_data "$table_name"
-            break
+    PS3=$(echo -e "${cyan}>> Select a table from the above list: ${clear}")
+    select table_name in "${tables_arr[@]}"; do
+        if [[ -n "$table_name" ]]; then #-n checks if choice is not null
+            SELECTED_TABLE=$table_name
+            echo -e "${blue}You selected table:${magenta} $table_name${clear}"
+            if is_valid_table; then
+                columns=($(cut -d: -f1 "$DB_DIR/$SELECTED_DB/$table_name.metadata"))
+                COLUMNS=$columns
+                select_table_menu "$table_name"
+            else
+                flag=0
+                tablesMenu
+            fi
         else
-            echo -e "${yellow}Invalid choice. Please select a valid number.${clear}"
+            echo -e "${yellow}Warning: Invalid choice.${clear}"
+            select_from_table
         fi
     done
 }
 
 # Function to handle table data options
-function select_table_data() {
-    echo -e "${cyan}What would you like to do with the table '$1'?${clear}"
+function select_table_menu() {
+    local table_name="$1"
+    PS3=$(echo -e "${cyan}>>Choose a select option for table ${magenta}[ $table_name ] ${clear}")
     select option in "Select all rows" "Select specific row" "Go back"; do
         case $option in
             "Select all rows")
-                read_rows "$1"
+                select_all "$table_name"
+                break
                 ;;
             "Select specific row")
-                read_rows_by_specific_column "$1"
+                select_where "$table_name"
+                break
                 ;;
             "Go back")
-                main_menu
+                tablesMenu
+                break
                 ;;
             *)
-                echo -e "${yellow}Warning: Invalid option. Please try again.${clear}"
+                echo -e "${yellow}Warning: Invalid option.${clear}"
                 ;;
         esac
     done
 }
 
 # Function to read all rows from a table
-function read_rows() {
-    if [[ -f "$DB_DIR/$SELECTED_DB/$1" ]]; then
-        echo -e "${cyan}Data from table '$1':${clear}"
-        cat "$DB_DIR/$SELECTED_DB/$1"
-    else
-        echo -e "${yellow}Warning: Table '$1' does not exist.${clear}"
-    fi
+function select_all() {
+    #internal field separator (IFS) to a tab (\t) so that elements of the array are joined with tabs instead of spaces.
+    echo -e "${magenta}$(IFS=$'\t'; echo "${columns[*]}")${clear}"
+    echo -e "${gray}$(cat "$DB_DIR/$SELECTED_DB/$1" | tr ':' '\t')${clear}"
+    select_table_menu $1
 }
 
 # Function to read rows by specific column value
-function read_rows_by_specific_column() {
-    # Ensure metadata file exists
-    if [[ ! -f "$DB_DIR/$SELECTED_DB/$1.metadata" ]]; then
-        echo -e "${yellow}Warning: Metadata file for table '$1' not found.${clear}"
-        return
+function select_where() {
+    column_name=""
+    PS3=$(echo -e "${cyan}>>Enter the column number to search by ${clear}")
+    
+    # Display column names as choices
+    select column_name in "${columns[@]}"; do
+        if [[ -n "$column_name" ]]; then
+            echo -e "${blue}Enter the value for column:${magenta} $column_name${clear}"
+            break  # Exit the loop when a valid column is selected
+        else
+            echo -e "${yellow}Invalid choice. Please select a valid column.${clear}"
+            # Re-prompt the user to select a valid column
+            select_where "$1"
+        fi
+    done
+
+    # Check if the column name is not null
+    if [[ -z "$column_name" ]]; then
+        echo -e "${yellow}Column name is null. Please try again.${clear}"
+        select_where
     fi
 
-    read -p "Enter the column name: " column_name
-    # Check if column name exists in metadata file
-    if grep -q "^$column_name:" "$DB_DIR/$SELECTED_DB/$1.metadata"; then
-        read -p "Enter the value: " value
-        data=$(grep "^$column_name:$value:" "$DB_DIR/$SELECTED_DB/$1")
+    # Get the value for the selected column
+    PS3=$(echo -e "${cyan}>>Enter the value for ${magenta}$column_name ${clear}")
+    read value
+    
+    echo -e "${blue}Getting records where ${magenta} $column_name ${blue} = ${red}'$value' ${clear}"
+
+    simulate_search
+
+    # Find the column index
+    column_index=$(grep -n "^$column_name:" "$DB_DIR/$SELECTED_DB/$1.metadata" | cut -d: -f1)
+
+    # If column index is found, proceed to search for the value in that column
+    if [[ -n "$column_index" ]]; then
+        # Search the table using awk to get the value at the selected column index
+        data=$(awk -F: -v col=$column_index -v val="$value" '$col == val' "$DB_DIR/$SELECTED_DB/$1")
+        
         if [[ -n "$data" ]]; then
-            echo -e "${cyan}Data from table '$1' matching '$column_name = $value':${clear}"
-            echo -e "$data"
+            # Count the number of matching rows and handle empty data
+            num_rows=$(echo "$data" | awk 'END {print NR}') # NR is the number of rows
+            echo -e "${gray}[ $num_rows ]${green} matching rows found!${clear}"
+            sleep 0.5
+
+            # Display the matching rows
+            echo -e "${green}THE MATCHING ROWS:${clear}"
+            sleep 0.5
+            echo -e "${magenta}$(IFS=$'\t'; echo "${columns[*]}")${clear}"
+            echo -e "${gray}$(echo "$data" | tr ':' '\t')${clear}"
         else
-            echo -e "${yellow}No matching data found.${clear}"
+            echo -e "${yellow}No matching rows found!${clear}"
         fi
+        
     else
-        echo -e "${yellow}Warning: Column name '$column_name' does not exist.${clear}"
+        echo -e "${yellow}Warning: Column '$column_name' not found in metadata.${clear}"
     fi
+    
+    tablesMenu
 }
+
