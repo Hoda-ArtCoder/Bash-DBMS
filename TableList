@@ -10,6 +10,12 @@ function listTables(){
 
   #dir containing tables
   dbDirPath="$DB_DIR/$SELECTED_DB"
+
+  tableCount=$(find "$dbDirPath" -type f ! -name "*.metadata" | wc -l)
+  if [[ "$tableCount" -eq 0 ]]; then
+    echo -e "${red}No tables found in the selected database.${clear}"
+    return
+  fi
   
   echo -e "${magenta}-- -- -- --Available Tables in $SELECTED_DB-- -- -- ${clear}"
   

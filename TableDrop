@@ -10,6 +10,12 @@ function drop_table(){
 
   #dir containing tables
   dbDirPath="$DB_DIR/$SELECTED_DB"
+
+  tableCount=$(find "$dbDirPath" -type f ! -name "*.metadata" | wc -l)
+  if [[ "$tableCount" -eq 0 ]]; then
+    echo -e "${red}No tables found in the selected database.${clear}"
+    return
+  fi
   
   #get only folders in the directory
   #awk '{print $NF}': Prints the last field (the name of the directory) from each line of the output.
