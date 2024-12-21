@@ -15,7 +15,7 @@ is_empty_input() {
 # Function: Check if directory already exists
 is_already_exists_dir() {
     if [ -d "$1" ]; then
-        echo -e "${yellow}Warning: Directory '$1' already exists.${clear}"
+        echo -e "${yellow}Warning: Database already exists.${clear}"
         return 0
     else
         return 1
@@ -25,7 +25,7 @@ is_already_exists_dir() {
 # Function: Check if file already exists
 is_already_exists_file() {
     if [ -f "$1" ]; then
-        echo -e "${yellow}Warning: File '$1' already exists.${clear}"
+        echo -e "${yellow}Warning: Table already exists.${clear}"
         return 0
     else
         return 1
