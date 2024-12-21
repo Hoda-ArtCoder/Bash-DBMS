@@ -1,9 +1,11 @@
 #!/bin/bash
 #global path to database directory
-DB_DIR="$(pwd)/DataBases"
+DB_DIR="$(pwd)/Databases"
 SELECTED_DB=""
 SELECTED_TABLE=""
 COLUMNS=""
+DATABASES_ARR=($(ls -l "$DB_DIR" | grep '^d' | awk '{print $NF}'))
+
 # Color variables
 red='\033[0;31m'
 green='\033[0;32m'

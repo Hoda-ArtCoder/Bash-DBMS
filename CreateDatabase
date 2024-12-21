@@ -21,6 +21,7 @@ function create_database() {
     if [ "$flag" -eq 1 ]; then
         if mkdir "$DB_DIR/$dbName"; then
             echo -e ${green}"---------DATABASE ${magenta}[ $dbName ]${green} CREATED SUCCESSFULLY----------"
+            DATABASES_ARR+=("$dbName")
         else
             echo -e ${red}"Could not create database '$dbName'."
         fi

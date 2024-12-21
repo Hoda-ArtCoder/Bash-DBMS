@@ -6,14 +6,13 @@ function connect_to_database() {
 
   #get only folders in the directory
   #awk '{print $NF}': Prints the last field (the name of the directory) from each line of the output.
-  databases_arr=($(ls -l "$DB_DIR" | grep '^d' | awk '{print $NF}'))
-  if is_array_empty "${databases_arr[@]}"; then
-      echo "No databases found in the directory."
+  if is_array_empty "${DATABASES_ARR[@]}"; then
+      echo -e "${blue}No databases found in the directory."
       return
   else
       echo -e "${magenta}-- -- -- --Connect to a Database-- -- -- --${clear}"
       PS3=$(echo -e "${cyan}>> Select a database from the following list: ${clear}")
-      select database_name in "${databases_arr[@]}"; do
+      select database_name in "${DATABASES_ARR[@]}"; do
           if [[ -n "$database_name" ]]; then
               SELECTED_DB=$database_name
               echo -e "${green}CONNECTED TO DATABASE:${magenta} $database_name${clear}"

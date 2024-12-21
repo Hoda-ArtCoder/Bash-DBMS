@@ -1,14 +1,44 @@
 #!/bin/bash
 source ./Common
 
-dropDatabase(){
-read -p "Enter database name you want to drop: " dropdb
- if [ -e "$DB_DIR/$dropdb" ]
- then
-   rm -r "$DB_DIR/$dropdb"
-   echo -e "${yellow}$dropdb is dropped${clear}"
- else
-   echo -e "${red}DB $dropdb is not exist${clear}"
- fi
- navigate_menu
+#dropDatabase(){
+#read -p "Enter database name you want to drop: " dropdb
+# if [ -e "$DB_DIR/$dropdb" ]
+# then
+#   rm -r "$DB_DIR/$dropdb"
+#   echo -e "${yellow}$dropdb is dropped${clear}"
+# else
+#   echo -e "${red}DB $dropdb is not exist${clear}"
+# fi
+# navigate_menu
+#}
+
+drop_database () {
+  if is_array_empty "${DATABASES_ARR[@]}"; then
+      echo -e "${blue}No databases found in the directory."
+      return
+  else
+      echo -e "${magenta}-- -- -- --Drop a Database-- -- -- --${clear}"
+      PS3=$(echo -e "${cyan}>> Select a database from the above list: ${clear}")
+      select database_name in "${DATABASES_ARR[@]}"; do
+          if [[ -n "$database_name" ]]; then
+              echo -e "${blue}Are you sure you want to drop ${magenta}$database_name${blue}?."
+              echo -e "${yellow}Warrning: This action cannot be undone. (yes/no) ${clear}"
+              read user_choice
+              if [[ "yes"  =~ "$user_choice" ]]; then
+                  rm -r "$DB_DIR/$database_name"
+                  # Update the DATABASES_ARR
+                  DATABASES_ARR=($(ls -l "$DB_DIR" | grep '^d' | awk '{print $NF}'))
+                  echo -e "${green}DATABASE:${magenta} $database_name ${green}DROPPED SUCCESSFULLY.${clear}"
+                  break
+              else
+                  echo -e "${yellow}Aborting database drop.${clear}"
+                  break
+              fi
+          else
+              echo -e "${yellow}Warning: Invalid choice. Please select a valid number.${clear}"
+          fi
+      done
+      main_menu
+  fi 
 }

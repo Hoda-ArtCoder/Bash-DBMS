@@ -5,6 +5,7 @@ source ./Common
 # Declare flag variable to check success of operations
 flag=1
 
+
 function create_table() {
     echo -e "${cyan}>> Enter table name: ${clear}" 
     read tblName
@@ -29,8 +30,10 @@ function create_table() {
             sleep 0.5
             echo -e "Continuing-----------------------------------${clear}" 
             
-            touch "$tblName" "$tblName.metadata"
-            if [[ -f "$tblName" && -f "$tblName.metadata" ]]; then
+            touch "$DB_DIR/$SELECTED_DB/$tblName"  
+            touch "$DB_DIR/$SELECTED_DB/$tblName.metadata"
+            
+            if [[ -f "$DB_DIR/$SELECTED_DB/$tblName" && -f "$DB_DIR/$SELECTED_DB/$tblName.metadata" ]]; then
                 echo -e "${green}Files '$tblName' and '$tblName.metadata' created successfully for table creation.${clear}"
             else
                 echo -e "${yellow}Warning: Failed to create files '$tblName' and/or '$tblName.metadata'.${clear}"
@@ -57,14 +60,14 @@ function create_columns() {
         ! is_empty_input "$colType" && ! is_invalid_datatype "$colType" && \
         ! is_duplicate_column "$colName" "$tblName.metadata" ; then
             #adding metadata PK row
-            echo  "$colName:$colType:PK" >> "$tblName.metadata"
+            echo  "$colName:$colType:PK" >> "$DB_DIR/$SELECTED_DB/$tblName.metadata"
             echo -e "${green}$colName:$colType:PK is added to $tblName.metadata ${clear}"
             flag=1
         else
             echo -e "${yellow}Failed validation checks. Aborting table creation...${clear}"
             sleep 0.5
             echo -e "${gray}Deleting files '$tblName' and '$tblName.metadata'${clear}"
-            rm "$tblName" "$tblName.metadata"
+            rm "$tblName" "$DB_DIR/$SELECTED_DB/$tblName.metadata"
             flag=0
             sleep 0.5
             tablesMenu
@@ -78,14 +81,14 @@ function create_columns() {
             read colName colType
             if ! is_empty_input "$colName" &&  is_valid_name "$colName" &&  \
             ! is_empty_input "$colType" && ! is_invalid_datatype "$colType" && \
-            ! is_duplicate_column "$colName" "$tblName.metadata" ; then
-                echo "$colName:$colType" >> "$tblName.metadata"
+            ! is_duplicate_column "$colName" "$DB_DIR/$SELECTED_DB/$tblName.metadata" ; then
+                echo "$colName:$colType" >> "$DB_DIR/$SELECTED_DB/$tblName.metadata"
                 sleep 0.5
                 echo -e "${green}$colName:$colType is added to $tblName.metadata ${clear}"
                 flag=1
             else
                 echo -e "${yellow}Failed validation checks. Aborting table creation...${clear}"
-                rm "$tblName" "$tblName.metadata"
+                rm "$tblName" "$DB_DIR/$SELECTED_DB/$tblName.metadata"
                  flag=0
                 tablesMenu
             fi

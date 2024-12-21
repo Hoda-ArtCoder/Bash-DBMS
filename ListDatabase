@@ -3,18 +3,19 @@ source ./Validations
 source ./Common
 
 function list_database() {
-    if [ -d "$DB_DIR" ]
-    then
+    
+    #check if the DB_DIR has databases in it
+    if [ ${#DATABASES_ARR[@]} -eq 0 ]; then
+        echo -e "${yellow}>>>>> No Databases Found! <<<<<< ${clear}"
+        navigate_menu
+    else
         echo -e "${magenta}-- -- -- -- Databases Lists available -- -- -- --${clear}"
         databases_arr=($(ls -l "$DB_DIR" | grep '^d' | awk '{print $NF}'))
 
         # Loop through the array and print each item on a new line
-        for database in "${databases_arr[@]}"; do
+        for database in "${DATABASES_ARR[@]}"; do
             echo -e "${blue}$database${clear} "
         done
-        navigate_menu
-    else
-        echo -e "${yellow}>>>>> No Databases Found! <<<<<< ${clear}"
         navigate_menu
     fi
 }

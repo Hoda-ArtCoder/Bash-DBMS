@@ -6,7 +6,7 @@ columns=()
 flag=1
 # Function to select data from a table
 function select_from_table() {
-    echo -e "${magenta}-- -- -- --Table Selection in $connDB -- -- -- --${clear}"
+    echo -e "${magenta}-- -- -- --Table Selection in $SELECTED_DB -- -- -- --${clear}"
     columns=()
     #arr to store tables
     tables_arr=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata")) #-v invert matches [select all files except .metadata]

@@ -118,3 +118,11 @@ function is_array_empty() {
     fi
     return 1  # Return (1)(false) if the array is not empty
 }
+
+is_already_exists_db_dir() {
+    if [ -d "$1" ]; then
+        return 0
+    else
+        return 1
+    fi
+}

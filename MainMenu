@@ -6,6 +6,11 @@ source ./ListDatabase
 source ./Validations
 
 function main_menu() {
+    #check if the directory exists
+    if ! is_already_exists_db_dir "$DB_DIR" ;then
+        mkdir -p "$DB_DIR"
+    fi
+
     echo -e "${magenta}-- -- -- -- Welcome to the Database Management System -- -- -- --${clear}"
     PS3=$(echo -e "${cyan}>> Choose an option: ${clear}") # Colorize the prompt
 
@@ -22,7 +27,7 @@ function main_menu() {
                 break  
                 ;;
             "Drop Database")
-                dropDatabase  # Call the function from DropDatabase
+                drop_database  # Call the function from DropDatabase
                 break
                 ;;
             "Exit")
