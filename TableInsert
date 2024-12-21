@@ -78,47 +78,42 @@ function insert_table_data() {
     fi
 
     if [ $flag -eq 1 ]; then
-        # Validate the data types of the input values
+        # Validate primary key and data types
         for i in "${!values[@]}"; do
-            if [ $i -eq 0 ]; then
-                # Check uniqueness of the first value (Primary Key)
-                if grep -q "^${values[$i]}:" "$DB_DIR/$SELECTED_DB/$table_name"; then
+            if [ $i -eq 0 ]; then  # First column is the primary key
+                # For single-column tables, check if the value exists as the primary key
+                if [ $(awk -F':' -v val="${values[$i]}" '$1 == val {print $1}' "$DB_DIR/$SELECTED_DB/$table_name" | wc -l) -gt 0 ]; then
                     echo -e "${yellow}Warning: Value '${values[$i]}' already exists as a primary key.${clear}"
                     flag=0
-                    insert_table_data #try again
-                fi
-                if { [ "${data_types[$i]}" == "int" ] && ! is_int "${values[$i]}"; } || { [ "${data_types[$i]}" == "string" ] && ! is_string "${values[$i]}"; }; then
-                    echo -e "${yellow}Warning: Invalid data type for column '${column_names[$i]}'.${clear}"
-                    flag=0
-                    insert_table_data
+                    insert_table_data # Try again
                 fi
             fi
-
+        
+            # Check data type for each column
             if { [ "${data_types[$i]}" == "int" ] && ! is_int "${values[$i]}"; } || { [ "${data_types[$i]}" == "string" ] && ! is_string "${values[$i]}"; }; then
                 echo -e "${yellow}Warning: Invalid data type for column '${column_names[$i]}'.${clear}"
                 flag=0
-                insert_table_data
+                insert_table_data # Try again
             fi
-
         done
-
-        if [ $flag -eq 1 ]; then
-            #s/ /:/g: Substitutes all spaces with (:)
-            echo "${values[@]}" | sed 's/ /:/g' >> "$DB_DIR/$SELECTED_DB/$table_name"
-            #checking the exit status of the previous command. If the exit status is equal to 0, it means the previous command was successful.
-            if [ $? -eq 0 ]; then
-                echo -e "${green}DATA INSERTED INTO TABLE '$table_name' SUCCESSFULLY.${clear}"
-                echo -e "${gray}Do you want to insert another row (y/n)? ${clear}"
-                read choice
-                if [ "$choice" == "y" ]; then
-                    insert_table_data
-                else
-                    tablesMenu
+        
+                if [ $flag -eq 1 ]; then
+                    #s/ /:/g: Substitutes all spaces with (:)
+                    echo "${values[@]}" | sed 's/ /:/g' >> "$DB_DIR/$SELECTED_DB/$table_name"
+                    #checking the exit status of the previous command. If the exit status is equal to 0, it means the previous command was successful.
+                    if [ $? -eq 0 ]; then
+                        echo -e "${green}DATA INSERTED INTO TABLE '$table_name' SUCCESSFULLY.${clear}"
+                        echo -e "${gray}Do you want to insert another row (y/n)? ${clear}"
+                        read choice
+                        if [ "$choice" == "y" ]; then
+                            insert_table_data
+                        else
+                            tablesMenu
+                        fi
+                    else
+                        echo -e "${yellow}Warning: Failed to insert data into the table.${clear}"
+                        insert_table_data
+                    fi
                 fi
-            else
-                echo -e "${yellow}Warning: Failed to insert data into the table.${clear}"
-                insert_table_data
-            fi
-        fi
     fi
 }
