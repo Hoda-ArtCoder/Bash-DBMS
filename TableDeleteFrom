@@ -13,11 +13,9 @@ function deleteFromTable() {
 
     # Display the table selection menu
     echo -e "${cyan}>> Select a table from the following list: ${clear}"
-    PS3="Enter the number corresponding to your choice: "
-
     select table_name in "${tables[@]}"; do
         if [[ -n "$table_name" ]]; then
-            echo -e "${blue}You selected table: $table_name${clear}"
+            echo -e "${blue}You selected table: ${magenta}$table_name${clear}"
             delete_from_table_menu "$table_name"
             break
         else
