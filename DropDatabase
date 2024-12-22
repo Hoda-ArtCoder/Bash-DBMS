@@ -3,8 +3,8 @@ source ./Common
 
 drop_database () {
   if is_array_empty "${DATABASES_ARR[@]}"; then
-      echo -e "${blue}No databases found in the directory."
-      return
+      echo -e "${blue}>>>>> No Databases Found! <<<<<< ${clear}"
+      navigate_menu
   else
       echo -e "${magenta}-- -- -- --Drop a Database-- -- -- --${clear}"
       PS3=$(echo -e "${cyan}>> Select a database from the above list: ${clear}")

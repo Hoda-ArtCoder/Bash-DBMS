@@ -23,7 +23,7 @@ function create_database() {
             echo -e ${green}"---------DATABASE ${magenta}[ $dbName ]${green} CREATED SUCCESSFULLY----------"
             DATABASES_ARR+=("$dbName")
         else
-            echo -e ${red}"Could not create database '$dbName'."
+            echo -e ${red}"Could not create database [ $dbName ]."
         fi
     fi
     navigate_menu

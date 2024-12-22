@@ -6,7 +6,7 @@ function list_database() {
     
     #check if the DB_DIR has databases in it
     if [ ${#DATABASES_ARR[@]} -eq 0 ]; then
-        echo -e "${yellow}>>>>> No Databases Found! <<<<<< ${clear}"
+        echo -e "${blue}>>>>> No Databases Found! <<<<<< ${clear}"
         navigate_menu
     else
         echo -e "${magenta}-- -- -- -- Databases Lists available -- -- -- --${clear}"
