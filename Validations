@@ -112,7 +112,7 @@ function is_valid_table () {
 }
 
 function is_array_empty() {
-    local array_name=("$@")  
+    array_name=("$@")  
     if [[ ${#array_name[@]} -eq 0 ]]; then
         return 0  # Return (0)(true) if the array is empty
     fi

@@ -1,6 +1,7 @@
 function update_table() {
-    echo -e "${magenta}-- -- -- --Table Update in $SELECTED_DB-- -- -- --${clear}"
+    echo -e "${magenta}-- -- -- -- Table Update in $SELECTED_DB -- -- -- --${clear}"
 
+    # List available tables in the selected database
     tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
 
     if [ ${#tables[@]} -eq 0 ]; then
@@ -35,6 +36,7 @@ function update_table() {
     echo -e "${cyan}Table structure:${clear}"
     awk -F':' '{print NR ". " $1}' "$metadata_file"
 
+    # Prompt for filter condition
     echo -e "${cyan}>>Enter the filter condition ${magenta}(e.g. name=Ahmed):${clear}"
     read filter_condition
     filter_column=$(echo "$filter_condition" | cut -d= -f1)
@@ -43,11 +45,13 @@ function update_table() {
     filter_col_index=$(awk -F':' -v col="$filter_column" '$1 == col {print NR}' "$metadata_file")
     if [ -z "$filter_col_index" ]; then
         echo -e "${yellow}Warning: Column '$filter_column' not found in metadata.${clear}"
-        updateTable
+        update_table  # Abort if the filter column doesn't exist
     fi
 
     echo -e "${gray}Filter Column found: [ $filter_column ] at index: $filter_col_index"
     sleep 0.5
+
+    # Prompt for update condition
     echo -e "${cyan}>>Enter the update condition ${magenta}(e.g. age=30):${clear}"
     read update_condition
     change_column=$(echo "$update_condition" | cut -d= -f1)
@@ -56,11 +60,12 @@ function update_table() {
     change_col_index=$(awk -F':' -v col="$change_column" '$1 == col {print NR}' "$metadata_file")
     if [ -z "$change_col_index" ]; then
         echo -e "${yellow}Warning: Column '$change_column' not found in metadata.${clear}"
-        updateTable
+        update_table  # Abort if the update column doesn't exist
     fi
 
     echo -e "${gray}Update Column found: [ $change_column ] at index: $change_col_index"
 
+    # Proceed with the update if no duplicates are found
     awk -F':' -v filter_col="$filter_col_index" -v filter_val="$filter_value" \
         -v update_col="$change_col_index" -v new_val="$new_value" \
         'BEGIN {OFS=FS} 
