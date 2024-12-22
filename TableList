@@ -2,6 +2,8 @@
 source ./Common
 
 function listTables(){
+  echo -e "${magenta}-- -- -- --Table Listing in $SELECTED_DB -- -- -- --${clear}"
+
   #ensure user is connected to db
   if [ -z "$SELECTED_DB" ]; then
     echo -e "${yellow}Warrning: No database selected. Please connect to a database first.${clear}"

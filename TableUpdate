@@ -1,4 +1,6 @@
-function updateTable() {
+function update_table() {
+    echo -e "${magenta}-- -- -- --Table Update in $SELECTED_DB -- -- -- --${clear}"
+
     tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
 
     if [ ${#tables[@]} -eq 0 ]; then
@@ -69,7 +71,7 @@ function updateTable() {
         echo -e "${green}RECORDS UPDATED SUCCESSFULLY!${clear}"
         sleep 0.5
     else
-        echo -e "${red}Error: Update failed.${clear}"
+        echo -e "${red}Error: Update Failed.${clear}"
     fi
 
     tablesMenu

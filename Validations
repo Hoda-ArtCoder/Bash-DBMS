@@ -106,7 +106,7 @@ function is_valid_table () {
             return 0
         fi
     else
-        echo -e "${yellow}Warning: Table '$SELECTED_TABLE' does not exist or corrupted.${clear}"
+        echo -e "${yellow}Warning: Table [ $SELECTED_TABLE ] does not exist or corrupted.${clear}"
         return -1
     fi
 }

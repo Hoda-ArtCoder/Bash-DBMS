@@ -48,7 +48,7 @@ function select_table_menu() {
         case $option in
             "Select all rows")
                 select_all "$table_name"
-                break
+                select_table_menu $1
                 ;;
             "Select specific row")
                 select_where "$table_name"
@@ -70,7 +70,6 @@ function select_all() {
     #internal field separator (IFS) to a tab (\t) so that elements of the array are joined with tabs instead of spaces.
     echo -e "${magenta}$(IFS=$'\t'; echo "${columns[*]}")${clear}"
     echo -e "${gray}$(cat "$DB_DIR/$SELECTED_DB/$1" | tr ':' '\t')${clear}"
-    select_table_menu $1
 }
 
 # Function to read rows by specific column value

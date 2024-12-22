@@ -7,6 +7,8 @@ flag=1
 
 
 function create_table() {
+    echo -e "${magenta}-- -- -- --Table Creation in $SELECTED_DB -- -- -- --${clear}"
+
     echo -e "${cyan}>> Enter table name: ${clear}" 
     read tblName
     

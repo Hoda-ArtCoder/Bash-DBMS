@@ -26,14 +26,14 @@ function tablesMenu(){
                 select_from_table
                 ;;
             "Update Table") 
-                updateTable
+                update_table
                 ;;
             "Drop Table")
                 drop_table
                 break
                 ;;
             "Delete from Table")
-                deleteFromTable
+                delete_from_table
                 ;;
             "Back to Main Menu")
                 main_menu
