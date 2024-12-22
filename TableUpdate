@@ -9,13 +9,13 @@ function updateTable() {
     metadata_file="$DB_DIR/$SELECTED_DB/$table_name.metadata"
 
     if [[ ! -f "$table_file" ]]; then
-        echo -e "${red}Error: Table '$table_name' does not exist.${clear}"
-        return
+        echo -e "${yellow}Warrning: Table '$table_name' does not exist.${clear}"
+        tablesMenu
     fi
 
     if [[ ! -f "$metadata_file" ]]; then
-        echo -e "${red}Error: Metadata file for '$table_name' not found.${clear}"
-        return
+        echo -e "${yellow}Warrning: Metadata file for '$table_name' not found.${clear}"
+        tablesMenu
     fi
 
     # Display table columns

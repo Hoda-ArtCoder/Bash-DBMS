@@ -68,7 +68,7 @@ function create_columns() {
             echo -e "${yellow}Failed validation checks. Aborting table creation...${clear}"
             sleep 0.5
             echo -e "${gray}Deleting files '$tblName' and '$tblName.metadata'${clear}"
-            rm "$tblName" "$DB_DIR/$SELECTED_DB/$tblName.metadata"
+            rm "$DB_DIR/$SELECTED_DB/$tblName" "$DB_DIR/$SELECTED_DB/$tblName.metadata"
             flag=0
             sleep 0.5
             tablesMenu

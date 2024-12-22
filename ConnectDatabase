@@ -8,7 +8,7 @@ function connect_to_database() {
   #awk '{print $NF}': Prints the last field (the name of the directory) from each line of the output.
   if is_array_empty "${DATABASES_ARR[@]}"; then
       echo -e "${blue}>>>>> No Databases Found! <<<<<< ${clear}"
-      return
+      navigate_menu
   else
       echo -e "${magenta}-- -- -- --Connect to a Database-- -- -- --${clear}"
       PS3=$(echo -e "${cyan}>> Select a database from the following list: ${clear}")

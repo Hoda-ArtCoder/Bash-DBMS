@@ -7,8 +7,11 @@ function deleteFromTable() {
     # Get the list of tables in the database
     tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
     if [[ ${#tables[@]} -eq 0 ]]; then
-        echo -e "${red}No tables found in the selected database.${clear}"
-        return
+        echo -e "${blue}No tables found in ${SELECTED_DB} ...${clear}"
+        sleep 0.5
+        echo -e "${blue}Aborting insertion......${clear}"
+        sleep 0.5
+        tablesMenu
     fi
 
     # Display the table selection menu
@@ -19,7 +22,7 @@ function deleteFromTable() {
             delete_from_table_menu "$table_name"
             break
         else
-            echo -e "${red}Invalid choice. Please select a valid number.${clear}"
+            echo -e "${yellow}Invalid choice. Please select a valid number.${clear}"
         fi
     done
 
@@ -41,7 +44,7 @@ function delete_from_table_menu() {
                 return
                 ;;
             *)
-                echo -e "${red}Warning: Invalid option. Please try again.${clear}"
+                echo -e "${yellow}Warning: Invalid option. Please try again.${clear}"
                 ;;
         esac
     done
@@ -53,21 +56,24 @@ function delete_row_by_column_value() {
     metadata_file="${table_file}.metadata"
 
     if [[ ! -f "$metadata_file" ]]; then
-        echo -e "${red}Metadata file for table '$1' not found.${clear}"
+        echo -e "${yellow}Metadata file for table '$1' not found.${clear}"
         return
     fi
 
-    read -p "Enter the column name: " column_name
+    echo -e "${cyan}Enter the column name for deletion: ${clear}"
+    read  column_name
     column_index=$(grep -n "^$column_name:" "$metadata_file" | cut -d: -f1)
 
     if [[ -z "$column_index" ]]; then
-        echo -e "${red}Warning: Column name '$column_name' does not exist.${clear}"
+        echo -e "${yellow}Warning: Column name '$column_name' does not exist.${clear}"
         return
     fi
 
-    read -p "Enter the value to match for deletion: " value
+    echo -e "${cyan}Enter the value to match for deletion: ${clear}"
+    read value 
     awk -F':' -v col="$column_index" -v val="$value" 'NR == 1 || $col != val' "$table_file" > tmp && mv tmp "$table_file"
-    echo -e "${green}Rows where '$column_name=$value' deleted successfully.${clear}"
+    echo -e "${green}ROWS WHERE '$column_name=$value' DELETED SUCCESSFULLY.${clear}"
+    tablesMenu
 }
 
 
@@ -82,5 +88,6 @@ function delete_all_rows() {
 
     #delete all rows
     truncate -s 0 "$table_file"
-    echo -e "${green}All rows deleted successfully. Table structure retained.${clear}"
+    echo -e "${green}ALL ROWS DELETED SUCCESSFULLY. Table structure retained.${clear}"
+    tablesMenu
 }

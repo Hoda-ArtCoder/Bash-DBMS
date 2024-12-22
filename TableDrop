@@ -4,7 +4,7 @@ source ./Common
 function drop_table(){
   # Ensure user is connected to db
   if [ -z "$SELECTED_DB" ]; then
-    echo -e "${red}Error: No database selected. Please connect to a database first.${clear}"
+    echo -e "${yellow}Warrning: No database selected. Please connect to a database first.${clear}"
     return
   fi
 
@@ -13,7 +13,7 @@ function drop_table(){
 
   tableCount=$(find "$dbDirPath" -type f ! -name "*.metadata" | wc -l)
   if [[ "$tableCount" -eq 0 ]]; then
-    echo -e "${red}No tables found in the selected database.${clear}"
+    echo -e "${blue}No tables found in the selected database.${clear}"
     return
   fi
   
