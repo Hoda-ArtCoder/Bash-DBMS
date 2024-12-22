@@ -31,13 +31,10 @@ function deleteFromTable() {
 # Function to display delete options
 function delete_from_table_menu() {
     echo -e "${cyan}What would you like to delete from table '$1'?${clear}"
-    select option in "Delete row by column value" "Clear column" "Delete all rows" "Go back"; do
+    select option in "Delete row by column value" "Delete all rows" "Go back"; do
         case $option in
             "Delete row by column value")
                 delete_row_by_column_value "$1"
-                ;;
-            "Clear column")
-                clear_column "$1"
                 ;;
             "Delete all rows")
                 delete_all_rows "$1"
@@ -75,32 +72,6 @@ function delete_row_by_column_value() {
     echo -e "${green}Rows where '$column_name=$value' deleted successfully.${clear}"
 }
 
-# Function to clear all values in a specific column
-function clear_column() {
-    table_file="$DB_DIR/$SELECTED_DB/$1"
-    metadata_file="${table_file}.metadata"
-
-    if [[ ! -f "$metadata_file" ]]; then
-        echo -e "${red}Metadata file for table '$1' not found.${clear}"
-        return
-    fi
-
-    read -p "Enter the column name to clear: " column_name
-    column_index=$(grep -n "^$column_name:" "$metadata_file" | cut -d: -f1)
-
-    if [[ -z "$column_index" ]]; then
-        echo -e "${red}Warning: Column name '$column_name' does not exist.${clear}"
-        return
-    fi
-
-    awk -F':' -v col="$column_index" '{
-        for (i = 1; i <= NF; i++) {
-            if (i == col) $i = ""
-        }
-        print $0
-    }' "$table_file" > tmp && mv tmp "$table_file"
-    echo -e "${green}Column '$column_name' cleared successfully.${clear}"
-}
 
 # Function to delete all rows in a table
 function delete_all_rows() {
