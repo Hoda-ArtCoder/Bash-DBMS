@@ -2,6 +2,7 @@
 source ./Common
 
 function drop_table(){
+  echo -e "${magenta}-- -- -- --Table Drop in $SELECTED_DB-- -- -- --${clear}"
   # Ensure user is connected to db
   if [ -z "$SELECTED_DB" ]; then
     echo -e "${yellow}Warrning: No database selected. Please connect to a database first.${clear}"
@@ -20,7 +21,6 @@ function drop_table(){
       tablesMenu
   else
   
-  echo -e "${magenta}-- -- -- --Drop a Table-- -- -- --${clear}"
   PS3=$(echo -e "${cyan}>> Select a table from the above list: ${clear}")
   select table_name in "${tables_arr[@]}"; do
       if [[ -n "$table_name" ]]; then

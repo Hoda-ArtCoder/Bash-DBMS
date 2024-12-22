@@ -4,7 +4,7 @@ source ./Common
 
 
 function delete_from_table() {
-    echo -e "${magenta}-- -- -- --Table Deletion in $SELECTED_DB -- -- -- --${clear}"
+    echo -e "${magenta}-- -- -- --Table Deletion in $SELECTED_DB-- -- -- --${clear}"
 
     # Get the list of tables in the database
     tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))

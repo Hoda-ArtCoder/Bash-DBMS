@@ -2,7 +2,7 @@
 source ./Common
 
 function listTables(){
-  echo -e "${magenta}-- -- -- --Table Listing in $SELECTED_DB -- -- -- --${clear}"
+  echo -e "${magenta}-- -- -- --Table Listing in $SELECTED_DB-- -- -- --${clear}"
 
   #ensure user is connected to db
   if [ -z "$SELECTED_DB" ]; then

@@ -7,7 +7,7 @@ flag=1
 
 # Function to insert data into a table
 function insert_into_table() {
-    echo -e "${magenta}-- -- -- --Table Insertion in $SELECTED_DB -- -- -- --${clear}"
+    echo -e "${magenta}-- -- -- --Table Insertion in $SELECTED_DB-- -- -- --${clear}"
 
     # List tables in the selected database (excluding metadata files)
     tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))

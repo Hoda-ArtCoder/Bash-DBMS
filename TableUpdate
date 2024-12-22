@@ -1,5 +1,5 @@
 function update_table() {
-    echo -e "${magenta}-- -- -- --Table Update in $SELECTED_DB -- -- -- --${clear}"
+    echo -e "${magenta}-- -- -- --Table Update in $SELECTED_DB-- -- -- --${clear}"
 
     tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
 
@@ -35,7 +35,7 @@ function update_table() {
     echo -e "${cyan}Table structure:${clear}"
     awk -F':' '{print NR ". " $1}' "$metadata_file"
 
-    echo -e "${blue}Enter the filter condition ${magenta}(e.g. name=Ahmed):${clear}"
+    echo -e "${cyan}>>Enter the filter condition ${magenta}(e.g. name=Ahmed):${clear}"
     read filter_condition
     filter_column=$(echo "$filter_condition" | cut -d= -f1)
     filter_value=$(echo "$filter_condition" | cut -d= -f2)
@@ -48,7 +48,7 @@ function update_table() {
 
     echo -e "${gray}Filter Column found: [ $filter_column ] at index: $filter_col_index"
     sleep 0.5
-    echo -e "${blue}Enter the update condition ${magenta}(e.g. age=30):${clear}"
+    echo -e "${cyan}>>Enter the update condition ${magenta}(e.g. age=30):${clear}"
     read update_condition
     change_column=$(echo "$update_condition" | cut -d= -f1)
     new_value=$(echo "$update_condition" | cut -d= -f2)
