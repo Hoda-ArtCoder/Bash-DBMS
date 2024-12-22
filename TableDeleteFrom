@@ -9,7 +9,7 @@ function deleteFromTable() {
     if [[ ${#tables[@]} -eq 0 ]]; then
         echo -e "${blue}No tables found in ${SELECTED_DB} ...${clear}"
         sleep 0.5
-        echo -e "${blue}Aborting insertion......${clear}"
+        echo -e "${blue}Aborting deletion......${clear}"
         sleep 0.5
         tablesMenu
     fi
@@ -31,11 +31,22 @@ function deleteFromTable() {
 
 # Function to display delete options
 function delete_from_table_menu() {
+    table_file="$DB_DIR/$SELECTED_DB/$1"
+    metadata_file="${table_file}.metadata"
+
+    if [[ ! -f "$metadata_file" ]]; then
+        echo -e "${yellow}Warning: Metadata file for table '$1' not found.${clear}"
+        return
+    fi
+
+    echo -e "${cyan}Columns in table '$1':${clear}"
+    awk -F':' '{print NR ". " $1}' "$metadata_file"
+
     echo -e "${cyan}What would you like to delete from table '$1'?${clear}"
     select option in "Delete row by column value" "Delete all rows" "Go back"; do
         case $option in
             "Delete row by column value")
-                delete_row_by_column_value "$1"
+                delete_row_by_id "$1"
                 ;;
             "Delete all rows")
                 delete_all_rows "$1"
@@ -50,8 +61,8 @@ function delete_from_table_menu() {
     done
 }
 
-# Function to delete rows based on column value
-function delete_row_by_column_value() {
+# Function to delete a row based on ID or specific column value
+function delete_row_by_id() {
     table_file="$DB_DIR/$SELECTED_DB/$1"
     metadata_file="${table_file}.metadata"
 
@@ -60,33 +71,31 @@ function delete_row_by_column_value() {
         return
     fi
 
-    echo -e "${cyan}Enter the column name for deletion: ${clear}"
-    read  column_name
-    column_index=$(grep -n "^$column_name:" "$metadata_file" | cut -d: -f1)
+    # Display the entire table with columns and values
+    echo -e "${cyan}Table contents:${clear}"
+    head -1 "$table_file" | awk -F':' '{ for (i = 1; i <= NF; i++) printf "%s\t", $i; print "" }'
+    tail -n +2 "$table_file" | awk -F':' '{ for (i = 1; i <= NF; i++) printf "%s\t", $i; print "" }'
 
-    if [[ -z "$column_index" ]]; then
-        echo -e "${yellow}Warning: Column name '$column_name' does not exist.${clear}"
-        return
-    fi
+    echo -e "${cyan}Enter the ID or unique value to delete the row:${clear}"
+    read id_value
 
-    echo -e "${cyan}Enter the value to match for deletion: ${clear}"
-    read value 
-    awk -F':' -v col="$column_index" -v val="$value" 'NR == 1 || $col != val' "$table_file" > tmp && mv tmp "$table_file"
-    echo -e "${green}ROWS WHERE '$column_name=$value' DELETED SUCCESSFULLY.${clear}"
+    # Assume the ID column is the first column
+    awk -F':' -v id="$id_value" 'NR == 1 || $1 != id' "$table_file" > tmp && mv tmp "$table_file"
+
+    echo -e "${green}Row with ID '$id_value' deleted successfully.${clear}"
     tablesMenu
 }
-
 
 # Function to delete all rows in a table
 function delete_all_rows() {
     table_file="$DB_DIR/$SELECTED_DB/$1"
 
     if [[ ! -f "$table_file" ]]; then
-        echo -e "${red}Warning: Table '$1' does not exist.${clear}"
+        echo -e "${yellow}Warning: Table '$1' does not exist.${clear}"
         return
     fi
 
-    #delete all rows
+    # Delete all rows
     truncate -s 0 "$table_file"
     echo -e "${green}ALL ROWS DELETED SUCCESSFULLY. Table structure retained.${clear}"
     tablesMenu

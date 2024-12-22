@@ -3,49 +3,76 @@ source ./Validations
 source ./Common
 
 function updateTable() {
+    # List tables in the selected database (excluding metadata files)
+    tables=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
+
+    # Check if there are any tables
+    if [ ${#tables[@]} -eq 0 ]; then
+        echo -e "${blue}No tables found in ${SELECTED_DB} ...${clear}"
+        sleep 0.5
+        echo -e "${blue}Aborting insertion......${clear}"
+        sleep 0.5
+        tablesMenu
+    else
+        echo -e "${cyan}Select a table from the following list:${clear}"
+        select table_name in "${tables[@]}"; do
+            if [ -n "$table_name" ]; then
+                echo -e "${blue}You selected table: ${magenta}$table_name ${clear}"
+                SELECTED_TABLE="$table_name"
+                sleep 0.5
+                break
+            else
+                echo -e "${yellow} Warrning: Invalid choice. ${clear}"
+                flag=0
+            fi
+        done
+    fi
+
     read -p "Enter the name of the table you want to update: " table_name
 
     table_file="$DB_DIR/$SELECTED_DB/$table_name"
     metadata_file="$DB_DIR/$SELECTED_DB/$table_name.metadata"
 
     if [[ ! -f "$table_file" ]]; then
-        echo -e "${yellow}Warrning: Table '$table_name' does not exist.${clear}"
+        echo -e "${yellow}Warning: Table '$table_name' does not exist.${clear}"
         tablesMenu
     fi
 
     if [[ ! -f "$metadata_file" ]]; then
-        echo -e "${yellow}Warrning: Metadata file for '$table_name' not found.${clear}"
+        echo -e "${yellow}Warning: Metadata file for '$table_name' not found.${clear}"
         tablesMenu
     fi
 
-    # Display table columns
+    # Display table columns with numbers
     echo -e "${cyan}Available columns:${clear}"
     awk -F':' '{print NR ". " $1}' "$metadata_file"
 
     # Prompt for column to filter records
-    read -p "Enter the column name to filter by: " filter_column
+    read -p "Enter the number of the column to filter by: " filter_col_number
 
-    # Find the column index in metadata
-    filter_col_index=$(grep -n "^$filter_column:" "$metadata_file" | cut -d: -f1)
-
-    if [[ -z "$filter_col_index" ]]; then
-        echo -e "${red}Warning: Column '$filter_column' does not exist.${clear}"
+    # Validate filter column number
+    filter_column=$(awk -F':' -v num="$filter_col_number" 'NR == num {print $1}' "$metadata_file")
+    if [[ -z "$filter_column" ]]; then
+        echo -e "${red}Warning: Invalid column number.${clear}"
         return
     fi
+
+    filter_col_index=$(grep -n "^$filter_column:" "$metadata_file" | cut -d: -f1)
 
     # Prompt for the value to search for
     read -p "Enter the value to filter records: " filter_value
 
     # Prompt for the column to update
-    read -p "Enter the column name to update: " update_column
+    read -p "Enter the number of the column to update: " update_col_number
 
-    # Find the update column index in metadata
-    update_col_index=$(grep -n "^$update_column:" "$metadata_file" | cut -d: -f1)
-
-    if [[ -z "$update_col_index" ]]; then
-        echo -e "${yellow}Warning: Column '$update_column' does not exist.${clear}"
+    # Validate update column number
+    update_column=$(awk -F':' -v num="$update_col_number" 'NR == num {print $1}' "$metadata_file")
+    if [[ -z "$update_column" ]]; then
+        echo -e "${yellow}Warning: Invalid column number.${clear}"
         return
     fi
+
+    update_col_index=$(grep -n "^$update_column:" "$metadata_file" | cut -d: -f1)
 
     # Prompt for the new value
     read -p "Enter the new value for '$update_column': " new_value
@@ -59,3 +86,4 @@ function updateTable() {
 
     echo -e "${green}Update successful!${clear}"
 }
+
