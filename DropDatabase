@@ -20,7 +20,7 @@ drop_database () {
                   echo -e "${green}DATABASE:${magenta} $database_name ${green}DROPPED SUCCESSFULLY.${clear}"
                   break
               else
-                  echo -e "${yellow}Aborting database drop.${clear}"
+                  echo -e "${blue}Aborting database drop.${clear}"
                   break
               fi
           else

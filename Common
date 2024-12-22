@@ -21,7 +21,7 @@ clear='\033[0m'
 function simulate_search() {
     # Simulate typing the dots one by one
     for i in {1..5}; do
-        sleep 0.5
+        sleep 0.3
         echo -n -e "${gray}. ${clear}"  # Print a dot without a newline
     done
     # Print a newline after the dots

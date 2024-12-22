@@ -76,13 +76,13 @@ function delete_row_by_id() {
     head -1 "$table_file" | awk -F':' '{ for (i = 1; i <= NF; i++) printf "%s\t", $i; print "" }'
     tail -n +2 "$table_file" | awk -F':' '{ for (i = 1; i <= NF; i++) printf "%s\t", $i; print "" }'
 
-    echo -e "${cyan}Enter the ID or unique value to delete the row:${clear}"
+    echo -e "${cyan}Enter the PK value of the row you want to delete:${clear}"
     read id_value
 
     # Assume the ID column is the first column
     awk -F':' -v id="$id_value" 'NR == 1 || $1 != id' "$table_file" > tmp && mv tmp "$table_file"
 
-    echo -e "${green}Row with ID '$id_value' deleted successfully.${clear}"
+    echo -e "${green}ROWS WITH PK '$id_value' DELETED SUCCESSFULLY.${clear}"
     tablesMenu
 }
 

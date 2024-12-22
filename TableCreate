@@ -89,7 +89,7 @@ function create_columns() {
                 flag=1
             else
                 echo -e "${yellow}Failed validation checks. Aborting table creation...${clear}"
-                rm "$tblName" "$DB_DIR/$SELECTED_DB/$tblName.metadata"
+                rm "$DB_DIR/$SELECTED_DB/$tblName" "$DB_DIR/$SELECTED_DB/$tblName.metadata"
                  flag=0
                 tablesMenu
             fi

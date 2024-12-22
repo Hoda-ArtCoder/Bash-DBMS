@@ -8,23 +8,21 @@ function drop_table(){
     return
   fi
 
-  #dir containing tables
-  dbDirPath="$DB_DIR/$SELECTED_DB"
+  # List tables in the selected database (excluding metadata files)
+  tables_arr=($(ls "$DB_DIR/$SELECTED_DB" | grep -v ".metadata"))
 
-  tableCount=$(find "$dbDirPath" -type f ! -name "*.metadata" | wc -l)
-  if [[ "$tableCount" -eq 0 ]]; then
-    echo -e "${blue}No tables found in the selected database.${clear}"
-    return
-  fi
+  # Check if there are any tables
+  if [ ${#tables_arr[@]} -eq 0 ]; then
+      echo -e "${blue}No tables found in ${SELECTED_DB} ...${clear}"
+      sleep 0.5
+      echo -e "${blue}Aborting table drop......${clear}"
+      sleep 0.5
+      tablesMenu
+  else
   
-  #get only folders in the directory
-  #awk '{print $NF}': Prints the last field (the name of the directory) from each line of the output.
-  #-l long format, -d directories -v invert matches 
-  TABLES_ARR=($(ls -l "$dbDirPath" | grep -v ".metadata" | awk '{print $NF}'))
-
   echo -e "${magenta}-- -- -- --Drop a Table-- -- -- --${clear}"
   PS3=$(echo -e "${cyan}>> Select a table from the above list: ${clear}")
-  select table_name in "${TABLES_ARR[@]}"; do
+  select table_name in "${tables_arr[@]}"; do
       if [[ -n "$table_name" ]]; then
           echo -e "${blue}Are you sure you want to drop ${magenta}$table_name${blue}?"
           echo -e "${yellow}Warrning: This action cannot be undone. (yes/no) ${clear}"
@@ -32,17 +30,21 @@ function drop_table(){
           if [[ "yes"  =~ "$user_choice" ]]; then
               rm -r "$DB_DIR/$SELECTED_DB/$table_name"
               rm -r "$DB_DIR/$SELECTED_DB/$table_name.metadata"
-              # Update the TABLES_ARR
-              TABLES_ARR=($(ls -l "$DB_DIR/$SELECTED_DB" | grep -v ".metadata" | awk '{print $NF}'))
+              # Update the tables_arr
+              tables_arr=($(ls -l "$DB_DIR/$SELECTED_DB" | grep -v ".metadata" | awk '{print $NF}'))
               echo -e "${green}TABLE${magenta} $table_name ${green}DROPPED SUCCESSFULLY.${clear}"
-              break
+              sleep 0.5
+              tablesMenu
           else
-              echo -e "${yellow}Aborting table drop.${clear}"
-              break
+              echo -e "${blue}Aborting table drop.${clear}"
+              sleep 0.5
+              tablesMenu
           fi
       else
           echo -e "${yellow}Warning: Invalid choice. Please select a valid number.${clear}"
       fi
   done
+  
   tablesMenu
+  fi
 }
