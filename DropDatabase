@@ -27,6 +27,6 @@ drop_database () {
               echo -e "${yellow}Warning: Invalid choice. Please select a valid number.${clear}"
           fi
       done
-      main_menu
+      navigate_menu
   fi 
 }
