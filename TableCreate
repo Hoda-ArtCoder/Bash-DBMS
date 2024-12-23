@@ -61,7 +61,7 @@ function create_columns() {
         read colName colType
         if ! is_empty_input "$colName" &&  is_valid_name "$colName" &&  \
         ! is_empty_input "$colType" && ! is_invalid_datatype "$colType" && \
-        ! is_duplicate_column "$colName" "$tblName.metadata" ; then
+        ! is_duplicate_column "$colName" "$DB_DIR/$SELECTED_DB/$tblName.metadata" ; then
             #adding metadata PK row
             echo  "$colName:$colType:PK" >> "$DB_DIR/$SELECTED_DB/$tblName.metadata"
             echo -e "${green}$colName:$colType:PK is added to $tblName.metadata ${clear}"
